@@ -4,7 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Cancha Pedro Lira</title>
-<meta name="theme-color" content="#1E6A47">
+<meta name="theme-color" content="#1E6A47" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#1B5C3E" media="(prefers-color-scheme: dark)">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Cancha">
@@ -15,84 +16,99 @@
 <meta name="color-scheme" content="light dark">
 <style>
 :root{
-  --bg:#F1F4F0; --card:#FFFFFF; --ink:#13241B; --ink2:#5B6C62; --line:#DCE3DA;
-  --cancha:#1E6A47; --cancha-osc:#17553A; --raya:rgba(255,255,255,.75);
+  --bg:#F2F5F0; --card:#FFFFFF; --ink:#13241B; --ink2:#4E5F55; --line:#D9E1D6;
+  --cancha:#1E6A47; --cancha-osc:#164F35; --raya:#FFFFFF; --accion:#1E6A47;
   --verde-suave:#DDEFE4; --verde-texto:#165536;
   --pelota:#D8EE4C; --pelota-ink:#283208;
-  --fijo:#E8ECE6; --fijo-ink:#56635A;
-  --bloq:#F3E6DC; --bloq-ink:#7B472A;
-  --rojo:#BF3A2B; --wsp:#25D366;
-  --row:54px; --gap:6px;
+  --fijo:#E5EAE3; --fijo-raya:#DAE1D7; --fijo-ink:#3F4D45;
+  --bloq:#F4E4D7; --bloq-raya:#EEDACA; --bloq-ink:#7A4426;
+  --rojo:#B4362A; --rojo-fondo:#B4362A; --wsp:#25D366;
+  --row:56px; --gap:8px;
   --sombra:0 10px 30px rgba(19,36,27,.16);
   --font:-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
 }
 @media (prefers-color-scheme:dark){
   :root{
-    --bg:#0E1612; --card:#16211B; --ink:#E7F0EA; --ink2:#98AB9F; --line:#26352C;
-    --cancha:#1B5C3E; --cancha-osc:#154831;
+    --bg:#0E1612; --card:#17221C; --ink:#E7F0EA; --ink2:#A3B4AA; --line:#2A3A31;
+    --cancha:#1B5C3E; --cancha-osc:#154831; --accion:#2E8B5F;
     --verde-suave:#1B3427; --verde-texto:#93E2B8;
-    --fijo:#202B25; --fijo-ink:#9DACA3; --bloq:#36271E; --bloq-ink:#EDBB98;
+    --fijo:#202B25; --fijo-raya:#27332C; --fijo-ink:#B4C2BA;
+    --bloq:#36271E; --bloq-raya:#3F2E23; --bloq-ink:#EDBB98;
+    --rojo:#F08A7E;
     --sombra:0 10px 30px rgba(0,0,0,.55);
   }
 }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font);font-size:16px;line-height:1.35;-webkit-text-size-adjust:100%}
 button{font:inherit;color:inherit;border:0;background:none;cursor:pointer;padding:0}
-button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid var(--pelota);outline-offset:2px}
+button:focus-visible,input:focus-visible,select:focus-visible,a:focus-visible{outline:3px solid var(--pelota);outline-offset:2px}
 input,select{font:inherit;font-size:16px}
 [hidden]{display:none!important}
 
-/* Cabecera: la cancha con su línea lateral */
-.cabecera{position:sticky;top:0;z-index:20}
-.top{background:var(--cancha);color:#fff;padding:calc(14px + env(safe-area-inset-top)) 16px 13px;display:flex;align-items:center;gap:12px;position:relative}
-.top::after{content:"";position:absolute;left:10px;right:10px;bottom:6px;height:2px;background:var(--raya);border-radius:2px}
-.pelota{width:30px;height:30px;border-radius:50%;background:var(--pelota);position:relative;flex:none;overflow:hidden}
-.pelota::before,.pelota::after{content:"";position:absolute;top:-2px;width:30px;height:30px;border:2px solid rgba(255,255,255,.9);border-radius:50%}
-.pelota::before{left:-20px}.pelota::after{right:-20px}
-.pelota.grande{width:56px;height:56px}
-.pelota.grande::before,.pelota.grande::after{width:56px;height:56px;border-width:3px}
-.pelota.grande::before{left:-38px}.pelota.grande::after{right:-38px}
+/* Cabecera: la cancha. Título, días y la línea blanca de fondo */
+.cabecera{position:sticky;top:0;z-index:20;background:var(--cancha);color:#fff;padding:env(safe-area-inset-top) 0 12px}
+.cabecera::after{content:"";position:absolute;left:10px;right:10px;bottom:5px;height:2px;background:var(--raya);border-radius:2px;opacity:.85}
+.top{display:flex;align-items:center;gap:10px;padding:10px 12px 8px;max-width:620px;margin:0 auto}
+.pelota{width:28px;height:28px;border-radius:50%;background:var(--pelota);position:relative;flex:none;overflow:hidden}
+.pelota::before,.pelota::after{content:"";position:absolute;top:-2px;width:28px;height:28px;border:2px solid rgba(255,255,255,.9);border-radius:50%}
+.pelota::before{left:-19px}.pelota::after{right:-19px}
+.pelota.grande{width:64px;height:64px}
+.pelota.grande::before,.pelota.grande::after{width:64px;height:64px;border-width:3px}
+.pelota.grande::before{left:-44px}.pelota.grande::after{right:-44px}
 .titulos{flex:1;min-width:0;cursor:pointer}
-.titulos h1{margin:0;font-size:19px;font-weight:750;letter-spacing:-.015em}
-.titulos p{margin:2px 0 0;font-size:15px;opacity:.85;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.yo{background:rgba(255,255,255,.16);color:#fff;border-radius:999px;padding:0 12px;font-size:15px;font-weight:650;min-height:40px;display:flex;align-items:center;gap:6px;white-space:nowrap}
-.yo .adm{font-size:12px;font-weight:750;background:var(--pelota);color:var(--pelota-ink);border-radius:6px;padding:2px 6px}
+.titulos h1{margin:0;font-size:18px;font-weight:750;letter-spacing:-.01em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.titulos p{margin:1px 0 0;font-size:15px;opacity:.9;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.yo{flex:none;background:rgba(255,255,255,.16);color:#fff;border-radius:999px;padding:0 12px;font-size:16px;font-weight:650;min-height:48px;display:flex;align-items:center;gap:6px;white-space:nowrap}
+.yo:active{background:rgba(255,255,255,.26)}
+.yo .adm{font-size:13px;font-weight:750;background:var(--pelota);color:var(--pelota-ink);border-radius:6px;padding:2px 6px}
 
-.dias{display:flex;gap:8px;overflow-x:auto;padding:10px 12px;background:var(--bg);border-bottom:1px solid var(--line);scrollbar-width:none}
-.dias::-webkit-scrollbar{display:none}
-.dia{flex:none;min-width:64px;min-height:56px;padding:6px 10px;border-radius:14px;background:var(--card);border:1.5px solid var(--line);text-align:center;position:relative}
-.dia b{display:block;font-size:14px;font-weight:600;color:var(--ink2)}
-.dia span{display:block;font-size:19px;font-weight:750;font-variant-numeric:tabular-nums}
-.dia.sel{background:var(--cancha);border-color:var(--cancha);color:#fff}
-.dia.sel b{color:#fff;opacity:.85}
-.dia em{display:block;font-style:normal;font-size:12.5px;font-weight:750;color:var(--bloq-ink);margin-top:1px}
-.dia.sel em{color:var(--pelota)}
-.dia .punto{position:absolute;top:6px;right:7px;width:8px;height:8px;border-radius:50%;background:var(--pelota);box-shadow:0 0 0 1.5px var(--card)}
+/* Días: 8 chips que caben en 375 px. El elegido es la pelota: relleno, borde grueso y número más grande */
+.dias{display:flex;padding:4px 4px 2px;max-width:620px;margin:0 auto}
+.dia{flex:1 1 0;min-width:0;position:relative;min-height:64px;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff;text-align:center;padding:4px 0}
+.dia::before{content:"";position:absolute;inset:0 2px;border:1.5px solid rgba(255,255,255,.55);border-radius:12px}
+.dia > b,.dia > span,.dia > i{position:relative}
+.dia > b{display:block;font-size:13px;font-weight:600;line-height:16px}
+.dia > span{display:block;font-size:20px;font-weight:700;line-height:25px;font-variant-numeric:tabular-nums}
+.dia .marca{display:flex;gap:3px;align-items:center;justify-content:center;height:14px;font-style:normal;font-size:12px;font-weight:750;line-height:14px}
+.dia .punto{display:block;width:8px;height:8px;border-radius:50%;background:var(--pelota);box-shadow:0 0 0 1.5px rgba(0,0,0,.25)}
+.dia:active::before{background:rgba(255,255,255,.14)}
+.dia.sel{color:var(--pelota-ink)}
+.dia.sel::before{inset:-3px 1px;background:var(--pelota);border:3px solid #fff;border-radius:13px}
+.dia.sel > span{font-size:23px;font-weight:800}
+.dia.sel > b{font-weight:800}
+.dia.sel .punto{background:var(--pelota-ink);box-shadow:none}
 
-main{padding:12px 12px 120px;max-width:620px;margin:0 auto}
-.leyenda{display:flex;gap:14px;flex-wrap:wrap;font-size:14px;color:var(--ink2);margin:2px 4px 12px}
-.leyenda i{display:inline-block;width:11px;height:11px;border-radius:3px;margin-right:6px;vertical-align:-1px}
+main{padding:14px 12px 120px;max-width:620px;margin:0 auto}
 
-/* Timeline */
-.fila{display:grid;grid-template-columns:50px 1fr;gap:8px;margin-bottom:var(--gap)}
-.hora{font-size:16px;font-variant-numeric:tabular-nums;color:var(--ink2);padding-top:17px;text-align:right}
-.slot{width:100%;min-height:var(--row);border-radius:14px;display:flex;align-items:center;justify-content:space-between;padding:0 14px;text-align:left}
-.libre{background:var(--card);border:1.5px dashed var(--line);font-weight:600;color:var(--ink2)}
-.libre .mas{width:32px;height:32px;border-radius:50%;background:var(--verde-suave);color:var(--verde-texto);display:grid;place-items:center;font-size:22px;font-weight:600;line-height:1}
-.libre:active{border-color:var(--cancha);border-style:solid;transform:scale(.99)}
-.libre.corto{font-weight:500;font-size:15px;opacity:.7}
-.bloque{flex-direction:column;align-items:flex-start;justify-content:center;padding:10px 14px;gap:2px}
-.bloque .t1{font-weight:700;font-size:16px}
+/* Título del día y avisos */
+.diatit{margin:2px 2px 12px}
+.diatit h2{margin:0;font-size:21px;font-weight:750;letter-spacing:-.01em;line-height:1.25}
+.aviso{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:6px 8px 6px 14px;margin:0 0 10px;display:flex;justify-content:space-between;align-items:center;gap:10px;font-size:15px;min-height:52px}
+.aviso.fer{background:var(--bloq);border-color:transparent;color:var(--bloq-ink);padding:12px 14px}
+.aviso button{color:var(--verde-texto);font-weight:750;min-height:48px;padding:0 10px;flex:none;border-radius:10px}
+.liberado{display:flex;gap:12px;align-items:flex-start;width:100%;min-height:48px;margin:0 0 10px;padding:12px 14px;border-radius:14px;background:var(--verde-suave);color:var(--verde-texto);font-size:15px;line-height:1.4;text-align:left}
+.liberado .ico{flex:none;width:24px;height:24px;border-radius:50%;background:var(--accion);color:#fff;display:grid;place-items:center;font-size:14px;font-weight:800;line-height:1}
+.liberado b{font-weight:750}
+
+/* Filas: la hora de inicio siempre a la izquierda, mismo tamaño y alineación */
+.slot{width:100%;min-height:var(--row);margin:0 0 var(--gap);border-radius:14px;display:flex;align-items:center;gap:12px;padding:0 9px 0 14px;text-align:left}
+.hh{flex:none;width:52px;font-size:17px;font-weight:700;line-height:23px;font-variant-numeric:tabular-nums}
+.cuerpo{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+.libre{background:var(--card);border:1.5px solid var(--line)}
+.libre .cuerpo{font-size:15px;font-weight:600;color:var(--ink2)}
+.libre .mas{flex:none;width:38px;height:38px;border-radius:50%;background:var(--accion);color:#fff;display:grid;place-items:center;font-size:24px;font-weight:600;line-height:1}
+.libre:active{border-color:var(--cancha);background:var(--verde-suave)}
+.libre.corto{background:transparent;border-color:transparent;min-height:44px;cursor:default}
+.libre.corto .hh{color:var(--ink2);font-weight:600}
+.bloque{align-items:flex-start;padding:16px 14px}
+.bloque .t1{font-weight:750;font-size:17px;line-height:23px}
 .bloque .t2{font-size:15px}
-.fijo{background:var(--fijo);color:var(--fijo-ink)}
-.bloqueo{background:var(--bloq);color:var(--bloq-ink)}
+.fijo{background:repeating-linear-gradient(135deg,var(--fijo) 0 10px,var(--fijo-raya) 10px 20px);color:var(--fijo-ink)}
+.bloqueo{background:repeating-linear-gradient(135deg,var(--bloq) 0 10px,var(--bloq-raya) 10px 20px);color:var(--bloq-ink)}
 .res{background:var(--verde-suave);color:var(--verde-texto)}
-.mia{background:var(--pelota);color:var(--pelota-ink)}
-.pasado{opacity:.38;pointer-events:none}
-.liberado{display:flex;gap:8px;align-items:center;width:calc(100% - 58px);margin:0 0 var(--gap) 58px;padding:8px 12px;border-radius:12px;border:1.5px solid var(--verde-suave);color:var(--verde-texto);font-size:13.5px;text-align:left}
-.liberado s{opacity:.8}
-.aviso{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;margin:0 0 12px;display:flex;justify-content:space-between;align-items:center;gap:10px;font-size:15px}
-.aviso button{color:var(--verde-texto);font-weight:700;min-height:40px}
+.mia{background:var(--pelota);color:var(--pelota-ink);box-shadow:inset 0 0 0 2px rgba(40,50,8,.22)}
+.pasado{opacity:.45;pointer-events:none}
+.paso{display:flex;align-items:center;min-height:44px;padding:0 14px;margin:0 0 var(--gap);border-radius:14px;border:1.5px solid var(--line);color:var(--ink2);font-size:15px}
 
 /* Hoja inferior */
 .velo{position:fixed;inset:0;background:rgba(8,18,12,.45);z-index:40;opacity:0;pointer-events:none;transition:opacity .2s}
@@ -100,62 +116,75 @@ main{padding:12px 12px 120px;max-width:620px;margin:0 auto}
 .hoja{position:fixed;left:0;right:0;bottom:0;z-index:41;background:var(--card);border-radius:22px 22px 0 0;padding:10px 18px calc(18px + env(safe-area-inset-bottom));max-height:90vh;overflow:auto;transform:translateY(105%);transition:transform .26s cubic-bezier(.2,.8,.2,1);box-shadow:var(--sombra);max-width:620px;margin:0 auto}
 .hoja.on{transform:none}
 .asa{width:42px;height:5px;border-radius:3px;background:var(--line);margin:0 auto 14px}
-.hoja h2{margin:0 0 3px;font-size:21px;letter-spacing:-.01em}
+.hoja h2{margin:0 0 3px;font-size:22px;font-weight:750;letter-spacing:-.01em}
 .sub{color:var(--ink2);margin:0 0 6px;font-size:15px}
-.lbl{font-size:15px;font-weight:700;margin:18px 0 9px}
+.lbl{font-size:16px;font-weight:750;margin:20px 0 10px}
 .chips{display:flex;flex-wrap:wrap;gap:8px}
-.chip{min-height:46px;padding:0 16px;border-radius:999px;background:var(--bg);border:1.5px solid var(--line);font-weight:650}
+.chip{min-height:48px;padding:0 16px;border-radius:999px;background:var(--card);border:1.5px solid var(--line);font-size:16px;font-weight:650;display:inline-flex;align-items:center;justify-content:center;gap:6px}
+.chip:active{border-color:var(--cancha)}
 .chip.sel{background:var(--cancha);border-color:var(--cancha);color:#fff}
-.btn{display:flex;align-items:center;justify-content:center;width:100%;min-height:54px;border-radius:15px;font-weight:700;font-size:17px;margin-top:12px}
-.btn.primario{background:var(--cancha);color:#fff;margin-top:22px}
+.chip.sel::before{content:"✓";font-weight:800}
+#chDur{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+#chDur .chip{flex-direction:column;gap:1px;border-radius:14px;min-height:62px;padding:6px 4px}
+#chDur .chip b{font-size:17px;font-weight:750}
+#chDur .chip small{font-size:15px;font-weight:500}
+#chDur .chip.sel{box-shadow:inset 0 0 0 2px rgba(255,255,255,.45)}
+#chDur .chip.sel::before{content:none}
+.btn{display:flex;align-items:center;justify-content:center;width:100%;min-height:54px;border-radius:15px;font-weight:700;font-size:17px;margin-top:12px;padding:0 14px;text-align:center}
+.btn.primario{background:var(--cancha);color:#fff;margin-top:22px;min-height:56px}
+.btn.primario:active{background:var(--cancha-osc)}
 .btn.primario:disabled{opacity:.45}
 .btn.secundario{background:var(--bg);border:1.5px solid var(--line)}
 .btn.peligro{color:var(--rojo);border:1.5px solid currentColor}
-.btn.peligro.confirmar,.mini.confirmar{background:var(--rojo);color:#fff;border-color:var(--rojo)}
+.btn.peligro.confirmar,.mini.confirmar{background:var(--rojo-fondo);color:#fff;border-color:var(--rojo-fondo)}
 .cargando{opacity:.75;pointer-events:none}
 .cargando::after{content:"";display:inline-block;width:16px;height:16px;margin-left:10px;border:2.5px solid currentColor;border-right-color:transparent;border-radius:50%;animation:gira .7s linear infinite}
 @keyframes gira{to{transform:rotate(360deg)}}
 .campo{width:100%;min-height:50px;border-radius:13px;border:1.5px solid var(--line);background:var(--bg);color:var(--ink);padding:0 14px;margin-top:10px}
-.nota{color:var(--ink2);font-size:14px;margin:14px 0 0}
+.nota{color:var(--ink2);font-size:15px;margin:14px 0 0}
 
 /* Toast */
-.toast{position:fixed;left:12px;right:12px;bottom:calc(80px + env(safe-area-inset-bottom));z-index:50;background:#13241B;color:#fff;border-radius:16px;padding:13px 14px 13px 16px;box-shadow:var(--sombra);display:flex;gap:12px;align-items:center;justify-content:space-between;transform:translateY(16px);opacity:0;pointer-events:none;transition:.22s;max-width:596px;margin:0 auto;font-size:15px}
+.toast{position:fixed;left:12px;right:12px;bottom:calc(76px + env(safe-area-inset-bottom));z-index:50;background:#13241B;color:#fff;border:1px solid rgba(255,255,255,.12);border-radius:16px;padding:10px 10px 10px 16px;min-height:56px;box-shadow:var(--sombra);display:flex;gap:12px;align-items:center;justify-content:space-between;transform:translateY(16px);opacity:0;pointer-events:none;transition:.22s;max-width:596px;margin:0 auto;font-size:15px}
 .toast.on{transform:none;opacity:1;pointer-events:auto}
-.toast.error{background:var(--rojo)}
-.toast a{flex:none;background:var(--wsp);color:#05301A;font-weight:750;border-radius:999px;padding:11px 14px;text-decoration:none;font-size:14px}
+.toast.error{background:var(--rojo-fondo)}
+.toast a{flex:none;display:inline-flex;align-items:center;min-height:44px;background:var(--wsp);color:#05301A;font-weight:750;border-radius:999px;padding:0 16px;text-decoration:none;font-size:15px}
 
 /* Barra inferior */
 .tabbar{position:fixed;left:0;right:0;bottom:0;z-index:30;background:var(--card);border-top:1px solid var(--line);display:flex;padding-bottom:env(safe-area-inset-bottom)}
-.tab{flex:1;min-height:62px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;font-size:13.5px;font-weight:650;color:var(--ink2);position:relative}
+.tab{flex:1;min-height:62px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;font-size:15px;font-weight:650;color:var(--ink2);position:relative}
 .tab svg{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
-.tab.sel{color:var(--verde-texto)}
-.tab .badge{position:absolute;top:8px;left:calc(50% + 6px);min-width:18px;height:18px;border-radius:9px;background:var(--pelota);color:var(--pelota-ink);font-size:11px;font-weight:800;display:grid;place-items:center;padding:0 5px}
+.tab.sel{color:var(--verde-texto);font-weight:750}
+.tab.sel::before{content:"";position:absolute;top:0;left:30%;right:30%;height:3px;border-radius:0 0 3px 3px;background:var(--verde-texto)}
+.tab .badge{position:absolute;top:7px;left:calc(50% + 6px);min-width:20px;height:20px;border-radius:10px;background:var(--pelota);color:var(--pelota-ink);font-size:13px;font-weight:800;display:grid;place-items:center;padding:0 5px}
 
-/* Pantalla ¿Quién eres? */
-.pantalla{position:fixed;inset:0;z-index:60;background:var(--bg);overflow:auto;padding:36px 18px 40px}
+/* Pantallas completas: ¿Quién eres? y carga */
+.pantalla{position:fixed;inset:0;z-index:60;background:var(--bg);overflow:auto;padding:calc(32px + env(safe-area-inset-top)) 18px 40px}
 .pantalla .inner{max-width:520px;margin:0 auto}
-.pantalla h2{font-size:28px;margin:20px 0 4px;letter-spacing:-.02em}
-.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:20px}
-.nombre{min-height:60px;border-radius:15px;background:var(--card);border:1.5px solid var(--line);font-size:17px;font-weight:650}
+.pantalla h2{font-size:28px;margin:18px 0 4px;letter-spacing:-.02em}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:18px}
+.nombre{min-height:60px;border-radius:15px;background:var(--card);border:1.5px solid var(--line);font-size:17px;font-weight:650;padding:0 8px;text-align:center}
 .nombre:active{background:var(--cancha);color:#fff;border-color:var(--cancha)}
+#cargando{background:var(--cancha);color:#fff}
+#cargando .sub{color:rgba(255,255,255,.9);font-size:16px}
+#cargando .btn.primario{background:var(--pelota);color:var(--pelota-ink)}
 
-/* Listas */
-.seccion{font-size:17px;font-weight:750;margin:14px 4px 10px}
-.tarjeta{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:13px 14px;margin-bottom:10px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+/* Listas: Mis reservas y Admin */
+.seccion{font-size:17px;font-weight:750;margin:16px 2px 10px}
+.tarjeta{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:12px 12px 12px 14px;margin-bottom:10px;display:flex;align-items:center;justify-content:space-between;gap:12px}
 .tarjeta.propia{border-left:6px solid var(--pelota)}
-.tf{font-weight:700}
+.tf{font-weight:700;font-size:17px}
 .tq{color:var(--ink2);font-size:15px;margin-top:2px}
 .tq .ok{color:var(--verde-texto)}
-.mini{flex:none;min-height:42px;padding:0 14px;border-radius:12px;font-weight:700;font-size:14px;border:1.5px solid var(--line);background:var(--bg)}
+.mini{flex:none;min-height:48px;padding:0 16px;border-radius:12px;font-weight:700;font-size:15px;border:1.5px solid var(--line);background:var(--bg)}
 .mini.verde{background:var(--cancha);border-color:var(--cancha);color:#fff}
 .mini.rojo{color:var(--rojo);border-color:currentColor;background:transparent}
 .cupo{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px;margin-bottom:6px;font-size:15px}
-.vacio{text-align:center;padding:46px 18px;color:var(--ink2)}
-.vacio .pelota{margin:0 auto 14px}
-.vacio h3{color:var(--ink);margin:0 0 6px;font-size:19px}
+.vacio{text-align:center;padding:40px 18px;color:var(--ink2);font-size:15px}
+.vacio .pelota{margin:0 auto 16px}
+.vacio h3{color:var(--ink);margin:0 0 6px;font-size:21px}
 .panel{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:14px 14px 16px;margin-bottom:14px}
-.panel h3{margin:0 0 4px;font-size:17px}
-.panel .sub{font-size:14px}
+.panel h3{margin:0 0 4px;font-size:18px}
+.panel .sub{font-size:15px}
 .dosc{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 
 @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
@@ -176,13 +205,6 @@ main{padding:12px 12px 120px;max-width:620px;margin:0 auto}
 </div>
 
 <main id="vCancha">
-  <div class="leyenda">
-    <span><i style="background:var(--card);border:1.5px dashed var(--ink2)"></i>Libre</span>
-    <span><i style="background:var(--pelota)"></i>Tuya</span>
-    <span><i style="background:var(--verde-suave);border:1px solid var(--verde-texto)"></i>Reservada</span>
-    <span><i style="background:var(--fijo);border:1px solid var(--fijo-ink)"></i>Fijo</span>
-    <span><i style="background:var(--bloq);border:1px solid var(--bloq-ink)"></i>Bloqueado</span>
-  </div>
   <div id="timeline"></div>
 </main>
 <main id="vMias" hidden></main>
@@ -283,7 +305,7 @@ async function accion(fn, arg, btn) {
     render();
     return r || { ok: false, msg: 'Sin respuesta. Intenta de nuevo.' };
   } catch (e) {
-    refrescar();
+    refrescar(); setTimeout(refrescar, 10000);
     return { ok: false, msg: 'No pudimos confirmar. En unos segundos revisa la cancha para ver si quedó.' };
   } finally {
     if (btn) btn.classList.remove('cargando');
@@ -292,8 +314,9 @@ async function accion(fn, arg, btn) {
 async function refrescar() {
   try {
     const r = await api('getEstado');
-    if (r && r.ok && aplicar(r)) render();
+    if (r && r.ok) { if (aplicar(r)) render(); return true; }
   } catch (e) {}
+  return false;
 }
 document.addEventListener('visibilitychange', () => {
   if (!document.hidden && Date.now() - ultimoRefresco > 20000) refrescar();
@@ -314,7 +337,7 @@ function render() {
   const p = partes(E.hoy);
   $('#titulo').textContent = E.nombreApp;
   $('#subtitulo').textContent = `Hoy ${DL[p.dow]} ${p.d} de ${ML[p.m - 1]}`;
-  $('#btnYo').innerHTML = `${esc(yo || 'Elegir')}${adminActivo() ? ' <span class="adm">ADMIN</span>' : ''} <span aria-hidden="true">▾</span>`;
+  $('#btnYo').innerHTML = `${esc(yo || 'Elegir')}${adminActivo() ? ' <span class="adm">Admin</span>' : ''} <span aria-hidden="true">▾</span>`;
   $('#dias').hidden = vista !== 'cancha';
   $('#tabAdmin').hidden = !adminActivo();
   document.querySelectorAll('.tab').forEach(t => t.classList.toggle('sel', t.dataset.v === vista));
@@ -331,9 +354,11 @@ function render() {
 function renderDias() {
   $('#dias').innerHTML = E.dias.map((d, i) => {
     const p = partes(d.fecha);
-    const arriba = i === 0 ? 'Hoy' : i === 1 ? 'Mañana' : DC[p.dow];
+    const arriba = i === 0 ? 'Hoy' : DC[p.dow];
     const mia = d.reservas.some(esMia);
-    return `<button class="dia ${i === diaSel ? 'sel' : ''}" data-i="${i}" aria-label="${esc(fechaLarga(d.fecha))}"><b>${arriba}</b><span>${p.d}</span>${d.feriado ? '<em>Feriado</em>' : ''}${mia ? '<i class="punto"></i>' : ''}</button>`;
+    const marca = (d.feriado ? 'Fer.' : '') + (mia ? '<i class="punto" aria-hidden="true"></i>' : '');
+    const nombre = cap(fechaLarga(d.fecha)) + (d.feriado ? ', feriado' : '') + (mia ? ', tienes reserva' : '');
+    return `<button class="dia ${i === diaSel ? 'sel' : ''}" data-i="${i}" aria-label="${esc(nombre)}"${i === diaSel ? ' aria-current="date"' : ''}><b>${arriba}</b><span>${p.d}</span><i class="marca">${marca}</i></button>`;
   }).join('');
 }
 
@@ -354,7 +379,7 @@ function contenidoBloque(x) {
   if (x.kind === 'fijo') return `<span class="t1">${esc(x.etiqueta)}</span><span class="t2">${rango}, horario fijo</span>`;
   if (x.kind === 'bloqueo') return `<span class="t1">${esc(x.etiqueta)}</span><span class="t2">${rango}, bloqueado</span>`;
   const quien = (x.kind === 'mia' && norm(x.para) === norm(yo)) ? 'Tú' : esc(x.para);
-  const por = norm(x.para) === norm(x.por) ? '' : (norm(x.por) === norm(yo) ? ' · la reservaste tú' : ` · reservó ${esc(x.por)}`);
+  const por = norm(x.para) === norm(x.por) ? '' : (norm(x.por) === norm(yo) ? ', la reservaste tú' : `, reservó ${esc(x.por)}`);
   return `<span class="t1">${quien}</span><span class="t2">${rango}${por}</span>`;
 }
 
@@ -363,36 +388,45 @@ function renderTimeline() {
   const esHoy = d.fecha === E.hoy;
   const ahora = ahoraMin();
   const occ = ocupacion(d);
-  const libs = d.bloques.filter(b => b.tipo === 'FIJO' && b.liberado);
-  let h = '';
+  const libs = d.bloques.filter(b => b.tipo === 'FIJO' && b.liberado && !(esHoy && b.fin <= ahora));
+  const cuando = diaSel === 0 ? 'Hoy, ' : diaSel === 1 ? 'Mañana, ' : '';
+  let h = `<div class="diatit"><h2>${cuando ? cuando + fechaLarga(d.fecha) : cap(fechaLarga(d.fecha))}</h2></div>`;
   if (esHoy && ahora >= E.cierre - 30 && E.dias.length > 1) {
     h += `<div class="aviso"><span>Por hoy ya no quedan horarios.</span><button data-ir="1">Ver mañana</button></div>`;
   }
   if (d.feriado) {
-    h += `<div class="aviso"><span><b>Feriado:</b> ${esc(d.feriado)}. Los horarios fijos no corren este día.</span></div>`;
+    h += `<div class="aviso fer"><span><b>Feriado:</b> ${esc(d.feriado)}. Los horarios fijos no corren este día.</span></div>`;
   }
+  libs.forEach(l => {
+    h += `<button class="liberado" data-accion="liberado" data-ini="${l.inicio}"><span class="ico" aria-hidden="true">✓</span><span>No hay <b>${esc(l.etiqueta)}</b> este día${l.motivo ? ' (' + esc(l.motivo) + ')' : ''}. Libre de ${hhmm(l.inicio)} a ${hhmm(l.fin)}.</span></button>`;
+  });
+  // Hoy: todo lo que ya pasó va en una sola línea
+  let pIni = -1, pFin = -1;
+  const cerrarPasado = () => {
+    if (pIni < 0) return;
+    h += `<div class="paso">${hhmm(pIni)}${pFin > pIni ? ' a ' + hhmm(pFin) : ''}, ya pasó</div>`;
+    pIni = -1;
+  };
   let t = E.apertura;
   while (t < E.cierre) {
-    libs.filter(l => l.inicio === t).forEach(l => {
-      h += `<button class="liberado" data-accion="liberado" data-ini="${l.inicio}"><span>✓</span><span><s>${esc(l.etiqueta)}</s> no va este día${l.motivo ? ' (' + esc(l.motivo) + ')' : ''}. Libre para reservar.</span></button>`;
-    });
     const x = occ.find(o => o.inicio <= t && o.fin > t);
     if (x) {
       const fin = Math.min(x.fin, E.cierre);
+      const sig = Math.ceil(fin / 30) * 30;
+      if (esHoy && fin <= ahora) { if (pIni < 0) pIni = t; pFin = t; t = sig; continue; }
+      cerrarPasado();
       const n = Math.max(1, Math.round((fin - t) / 30));
-      const pas = esHoy && fin <= ahora;
-      h += `<div class="fila"><div class="hora">${hhmm(t)}</div><button class="slot bloque ${x.kind} ${pas ? 'pasado' : ''}" style="min-height:calc(var(--row) * ${n} + var(--gap) * ${n - 1})" data-accion="${x.kind}" data-ini="${x.inicio}" data-id="${esc(x.id || '')}">${contenidoBloque(x)}</button></div>`;
-      libs.filter(l => l.inicio > t && l.inicio < fin).forEach(l => {
-        h += `<button class="liberado" data-accion="liberado" data-ini="${l.inicio}"><span>✓</span><span><s>${esc(l.etiqueta)}</s> no va este día${l.motivo ? ' (' + esc(l.motivo) + ')' : ''}. Libre para reservar.</span></button>`;
-      });
-      t = Math.ceil(fin / 30) * 30;
+      h += `<button class="slot bloque ${x.kind}" style="min-height:calc(var(--row) * ${n} + var(--gap) * ${n - 1})" data-accion="${x.kind}" data-ini="${x.inicio}" data-id="${esc(x.id || '')}"><span class="hh">${hhmm(t)}</span><span class="cuerpo">${contenidoBloque(x)}</span></button>`;
+      t = sig;
       continue;
     }
-    const pas = esHoy && t < ahora;
+    if (esHoy && t < ahora) { if (pIni < 0) pIni = t; pFin = t; t += 30; continue; }
+    cerrarPasado();
     const cabe = libreHasta(occ, t) - t >= 60;
-    h += `<div class="fila"><div class="hora">${hhmm(t)}</div><button class="slot libre ${pas ? 'pasado' : ''} ${cabe ? '' : 'corto'}" data-accion="libre" data-t="${t}" ${pas || !cabe ? 'disabled' : ''}><span>${cabe ? 'Libre' : 'Solo 30 min libres'}</span>${cabe ? '<span class="mas" aria-hidden="true">+</span>' : ''}</button></div>`;
+    h += `<button class="slot libre ${cabe ? '' : 'corto'}" data-accion="libre" data-t="${t}" ${cabe ? '' : 'disabled'}><span class="hh">${hhmm(t)}</span><span class="cuerpo">${cabe ? 'Libre' : 'Solo 30 min libres'}</span>${cabe ? '<span class="mas" aria-hidden="true">+</span>' : ''}</button>`;
     t += 30;
   }
+  cerrarPasado();
   $('#timeline').innerHTML = h;
 }
 
@@ -436,7 +470,7 @@ function renderAdmin() {
   let fijos = '';
   E.dias.forEach(d => d.bloques.filter(b => b.tipo === 'FIJO').forEach(b => {
     if (d.fecha === E.hoy && b.fin <= ahora) return;
-    fijos += `<div class="tarjeta"><div><div class="tf">${cap(fechaMedia(d.fecha))}, ${hhmm(b.inicio)} a ${hhmm(b.fin)}</div><div class="tq">${esc(b.etiqueta)}${b.feriado ? ' · <b class="ok">feriado, no va</b>' : b.liberado ? ' · <b class="ok">liberado</b>' : ''}</div></div>${b.feriado ? '' : b.liberado ? `<button class="mini" data-deshacer="${esc(b.excId)}">Deshacer</button>` : `<button class="mini verde" data-liberar="${d.fecha}|${b.inicio}|${b.fin}">Liberar</button>`}</div>`;
+    fijos += `<div class="tarjeta"><div><div class="tf">${cap(fechaMedia(d.fecha))}, ${hhmm(b.inicio)} a ${hhmm(b.fin)}</div><div class="tq">${esc(b.etiqueta)}${b.feriado ? ', <b class="ok">feriado, no va</b>' : b.liberado ? ', <b class="ok">liberado</b>' : ''}</div></div>${b.feriado ? '' : b.liberado ? `<button class="mini" data-deshacer="${esc(b.excId)}">Deshacer</button>` : `<button class="mini verde" data-liberar="${d.fecha}|${b.inicio}|${b.fin}">Liberar</button>`}</div>`;
   }));
   let bloqueos = '';
   E.dias.forEach(d => d.bloques.filter(b => b.tipo === 'BLOQUEO').forEach(b => {
@@ -513,7 +547,7 @@ function abrirReserva(d, t) {
     <h2>${cap(fechaMedia(d.fecha))}, ${hhmm(t)}</h2>
     <p class="sub">${cap(fechaLarga(d.fecha))}</p>
     <p class="lbl">¿Cuánto rato?</p>
-    <div class="chips" id="chDur">${durs.map(x => `<button class="chip" data-dur="${x}">${durTxt(x)}</button>`).join('')}</div>
+    <div class="chips" id="chDur">${durs.map(x => `<button class="chip" data-dur="${x}"><b>${durTxt(x)}</b><small>hasta ${hhmm(t + x)}</small></button>`).join('')}</div>
     <p class="lbl">¿Quién juega?</p>
     <div class="chips" id="chPara">${paraOpciones()}</div>
     <div id="panelOtro" hidden>
@@ -549,9 +583,10 @@ function pintarReserva() {
   document.querySelectorAll('#chPara .chip').forEach(c => c.classList.toggle('sel', R.panel ? c.dataset.para === '__otro' : norm(c.dataset.para) === norm(R.para)));
   document.querySelectorAll('#chTodos .chip').forEach(c => c.classList.toggle('sel', c.dataset.pick === R.para));
   const para = String(R.para).trim();
-  const elegido = !R.panel || E.familia.some(f => f.nombre === para);
+  const lista = E.familia.filter(f => norm(f.nombre) !== norm(yo));
+  const elegido = !R.panel || norm(para) === norm(yo) || lista.some(f => f.nombre === para);
   // Escrito a mano y parecido a alguien de la lista: obliga a tocar el nombre
-  const aMedias = !elegido && para && E.familia.some(f => norm(f.nombre).startsWith(norm(para)));
+  const aMedias = !elegido && para && lista.some(f => norm(f.nombre).startsWith(norm(para)));
   const b = $('#btnOk');
   b.textContent = aMedias ? 'Toca el nombre en la lista'
     : `Reservar ${hhmm(R.t)} a ${hhmm(R.t + R.dur)}` + (para && norm(para) !== norm(yo) ? ` para ${para}` : '');
@@ -703,6 +738,7 @@ function toast(msg, tipo, wsp) {
   el.innerHTML = `<span>${esc(msg)}</span>${wsp ? `<a href="https://wa.me/?text=${encodeURIComponent(wsp)}" target="_blank" rel="noopener">Avisar al grupo</a>` : ''}`;
   clearTimeout(toastTimer);
   if (tipo !== 'error') toastTimer = setTimeout(() => el.classList.remove('on'), wsp ? 9000 : 4000);
+  else if ($('#hoja').classList.contains('on')) toastTimer = setTimeout(() => el.classList.remove('on'), 8000);
 }
 $('#toast').addEventListener('click', e => { if (!e.target.closest('a')) $('#toast').classList.remove('on'); });
 
@@ -772,7 +808,10 @@ $('#vAdmin').addEventListener('click', async e => {
 });
 
 /* ---------- inicio ---------- */
-$('#titulos').addEventListener('click', async () => { await refrescar(); toast('Actualizado.'); });
+$('#titulos').addEventListener('click', async () => {
+  const ok = await refrescar();
+  toast(ok ? 'Actualizado.' : 'No se pudo actualizar.', ok ? 'ok' : 'error');
+});
 
 async function iniciar() {
   const pc = $('#cargando');
@@ -796,6 +835,8 @@ async function iniciar() {
   pc.hidden = true;
   render();
   if (!yo) mostrarQuien(); else scrollAhora();
+  // PIN guardado que ya no sirve (por ejemplo, si cambió en Config): se borra
+  if (pin && soyAdmin()) api('verificarPin', pin).then(v => { if (v && !v.ok && /incorrecto/.test(v.msg)) { pin = ''; LS.del('cpl_pin'); render(); } }).catch(() => {});
 }
 iniciar();
 </script>
