@@ -54,36 +54,36 @@ input,select{font:inherit;font-size:16px}
 .pelota.grande::before{left:-38px}.pelota.grande::after{right:-38px}
 .titulos{flex:1;min-width:0;cursor:pointer}
 .titulos h1{margin:0;font-size:19px;font-weight:750;letter-spacing:-.015em}
-.titulos p{margin:2px 0 0;font-size:13.5px;opacity:.85;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.titulos p{margin:2px 0 0;font-size:15px;opacity:.85;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .yo{background:rgba(255,255,255,.16);color:#fff;border-radius:999px;padding:0 12px;font-size:15px;font-weight:650;min-height:40px;display:flex;align-items:center;gap:6px;white-space:nowrap}
-.yo .adm{font-size:11px;font-weight:750;background:var(--pelota);color:var(--pelota-ink);border-radius:6px;padding:2px 6px}
+.yo .adm{font-size:12px;font-weight:750;background:var(--pelota);color:var(--pelota-ink);border-radius:6px;padding:2px 6px}
 
 .dias{display:flex;gap:8px;overflow-x:auto;padding:10px 12px;background:var(--bg);border-bottom:1px solid var(--line);scrollbar-width:none}
 .dias::-webkit-scrollbar{display:none}
 .dia{flex:none;min-width:64px;min-height:56px;padding:6px 10px;border-radius:14px;background:var(--card);border:1.5px solid var(--line);text-align:center;position:relative}
-.dia b{display:block;font-size:13px;font-weight:600;color:var(--ink2)}
+.dia b{display:block;font-size:14px;font-weight:600;color:var(--ink2)}
 .dia span{display:block;font-size:19px;font-weight:750;font-variant-numeric:tabular-nums}
 .dia.sel{background:var(--cancha);border-color:var(--cancha);color:#fff}
 .dia.sel b{color:#fff;opacity:.85}
-.dia em{display:block;font-style:normal;font-size:10.5px;font-weight:750;color:var(--bloq-ink);margin-top:1px}
+.dia em{display:block;font-style:normal;font-size:12.5px;font-weight:750;color:var(--bloq-ink);margin-top:1px}
 .dia.sel em{color:var(--pelota)}
 .dia .punto{position:absolute;top:6px;right:7px;width:8px;height:8px;border-radius:50%;background:var(--pelota);box-shadow:0 0 0 1.5px var(--card)}
 
 main{padding:12px 12px 120px;max-width:620px;margin:0 auto}
-.leyenda{display:flex;gap:14px;flex-wrap:wrap;font-size:13px;color:var(--ink2);margin:2px 4px 12px}
+.leyenda{display:flex;gap:14px;flex-wrap:wrap;font-size:14px;color:var(--ink2);margin:2px 4px 12px}
 .leyenda i{display:inline-block;width:11px;height:11px;border-radius:3px;margin-right:6px;vertical-align:-1px}
 
 /* Timeline */
 .fila{display:grid;grid-template-columns:50px 1fr;gap:8px;margin-bottom:var(--gap)}
-.hora{font-size:14px;font-variant-numeric:tabular-nums;color:var(--ink2);padding-top:17px;text-align:right}
+.hora{font-size:16px;font-variant-numeric:tabular-nums;color:var(--ink2);padding-top:17px;text-align:right}
 .slot{width:100%;min-height:var(--row);border-radius:14px;display:flex;align-items:center;justify-content:space-between;padding:0 14px;text-align:left}
 .libre{background:var(--card);border:1.5px dashed var(--line);font-weight:600;color:var(--ink2)}
 .libre .mas{width:32px;height:32px;border-radius:50%;background:var(--verde-suave);color:var(--verde-texto);display:grid;place-items:center;font-size:22px;font-weight:600;line-height:1}
 .libre:active{border-color:var(--cancha);border-style:solid;transform:scale(.99)}
-.libre.corto{font-weight:500;font-size:14px}
+.libre.corto{font-weight:500;font-size:15px;opacity:.7}
 .bloque{flex-direction:column;align-items:flex-start;justify-content:center;padding:10px 14px;gap:2px}
 .bloque .t1{font-weight:700;font-size:16px}
-.bloque .t2{font-size:13.5px;opacity:.85}
+.bloque .t2{font-size:15px}
 .fijo{background:var(--fijo);color:var(--fijo-ink)}
 .bloqueo{background:var(--bloq);color:var(--bloq-ink)}
 .res{background:var(--verde-suave);color:var(--verde-texto)}
@@ -126,7 +126,7 @@ main{padding:12px 12px 120px;max-width:620px;margin:0 auto}
 
 /* Barra inferior */
 .tabbar{position:fixed;left:0;right:0;bottom:0;z-index:30;background:var(--card);border-top:1px solid var(--line);display:flex;padding-bottom:env(safe-area-inset-bottom)}
-.tab{flex:1;min-height:62px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;font-size:12.5px;font-weight:650;color:var(--ink2);position:relative}
+.tab{flex:1;min-height:62px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;font-size:13.5px;font-weight:650;color:var(--ink2);position:relative}
 .tab svg{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
 .tab.sel{color:var(--verde-texto)}
 .tab .badge{position:absolute;top:8px;left:calc(50% + 6px);min-width:18px;height:18px;border-radius:9px;background:var(--pelota);color:var(--pelota-ink);font-size:11px;font-weight:800;display:grid;place-items:center;padding:0 5px}
@@ -144,7 +144,7 @@ main{padding:12px 12px 120px;max-width:620px;margin:0 auto}
 .tarjeta{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:13px 14px;margin-bottom:10px;display:flex;align-items:center;justify-content:space-between;gap:12px}
 .tarjeta.propia{border-left:6px solid var(--pelota)}
 .tf{font-weight:700}
-.tq{color:var(--ink2);font-size:14px;margin-top:2px}
+.tq{color:var(--ink2);font-size:15px;margin-top:2px}
 .tq .ok{color:var(--verde-texto)}
 .mini{flex:none;min-height:42px;padding:0 14px;border-radius:12px;font-weight:700;font-size:14px;border:1.5px solid var(--line);background:var(--bg)}
 .mini.verde{background:var(--cancha);border-color:var(--cancha);color:#fff}
@@ -181,6 +181,7 @@ main{padding:12px 12px 120px;max-width:620px;margin:0 auto}
     <span><i style="background:var(--pelota)"></i>Tuya</span>
     <span><i style="background:var(--verde-suave);border:1px solid var(--verde-texto)"></i>Reservada</span>
     <span><i style="background:var(--fijo);border:1px solid var(--fijo-ink)"></i>Fijo</span>
+    <span><i style="background:var(--bloq);border:1px solid var(--bloq-ink)"></i>Bloqueado</span>
   </div>
   <div id="timeline"></div>
 </main>
@@ -222,6 +223,9 @@ let yo = LS.get('cpl_yo', '');
 let pin = LS.get('cpl_pin', '');
 let recientes = LS.get('cpl_recientes', LS.get('cpl_otros', []));
 let diaSel = 0;
+let fechaSel = '';
+const K = new URLSearchParams(location.search).get('k') || LS.get('cpl_k', '');
+if (K) LS.set('cpl_k', K);
 let vista = 'cancha';
 let R = {};
 const FA = { fecha: '', ini: '', fin: '', etiqueta: '', nombre: '' };
@@ -251,26 +255,36 @@ function esMia(r) { return norm(r.para) === norm(yo) || norm(r.por) === norm(yo)
 function nombresAdmin() { return E.familia.filter(f => f.admin).map(f => f.nombre).join(' o '); }
 
 /* ---------- servidor ---------- */
+let seq = 0, aplicado = 0;
 async function api(fn, arg) {
   // credentials:'omit' evita el problema de Chrome con varias cuentas de Google
-  const r = await fetch(API_URL, {
-    method: 'POST', credentials: 'omit', redirect: 'follow',
-    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-    body: JSON.stringify({ fn: fn, arg: arg === undefined ? null : arg })
-  });
-  if (!r.ok) throw new Error('HTTP ' + r.status);
-  return r.json();
+  const id = ++seq, ctl = new AbortController(), to = setTimeout(() => ctl.abort(), 25000);
+  try {
+    const r = await fetch(API_URL, {
+      method: 'POST', credentials: 'omit', redirect: 'follow', signal: ctl.signal,
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify({ fn: fn, arg: arg === undefined ? null : arg, k: K })
+    });
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    const j = await r.json(); j._seq = id; return j;
+  } finally { clearTimeout(to); }
+}
+function aplicar(r) {
+  if (!r || !r.estado || r._seq < aplicado) return false;
+  aplicado = r._seq; E = r.estado; cargadoEn = ultimoRefresco = Date.now();
+  return true;
 }
 async function accion(fn, arg, btn) {
   if (btn) btn.classList.add('cargando');
   try {
     const r = await api(fn, Object.assign({ quien: yo, pin: adminActivo() ? pin : '' }, arg));
-    if (r && r.estado) { E = r.estado; cargadoEn = Date.now(); ultimoRefresco = Date.now(); }
+    aplicar(r);
     if (r && !r.ok && /PIN/.test(r.msg)) { pin = ''; LS.del('cpl_pin'); }
     render();
     return r || { ok: false, msg: 'Sin respuesta. Intenta de nuevo.' };
   } catch (e) {
-    return { ok: false, msg: 'No hay conexión. Revisa tu internet e intenta de nuevo.' };
+    refrescar();
+    return { ok: false, msg: 'No pudimos confirmar. En unos segundos revisa la cancha para ver si quedó.' };
   } finally {
     if (btn) btn.classList.remove('cargando');
   }
@@ -278,7 +292,7 @@ async function accion(fn, arg, btn) {
 async function refrescar() {
   try {
     const r = await api('getEstado');
-    if (r && r.ok) { E = r.estado; cargadoEn = Date.now(); ultimoRefresco = Date.now(); render(); }
+    if (r && r.ok && aplicar(r)) render();
   } catch (e) {}
 }
 document.addEventListener('visibilitychange', () => {
@@ -293,7 +307,9 @@ setInterval(() => {
 /* ---------- render ---------- */
 function render() {
   if (!E) return;
-  if (diaSel >= E.dias.length) diaSel = 0;
+  const iSel = E.dias.findIndex(d => d.fecha === fechaSel);
+  diaSel = iSel >= 0 ? iSel : 0;
+  fechaSel = E.dias[diaSel].fecha;
   if (vista === 'admin' && !adminActivo()) vista = 'cancha';
   const p = partes(E.hoy);
   $('#titulo').textContent = E.nombreApp;
@@ -366,12 +382,15 @@ function renderTimeline() {
       const n = Math.max(1, Math.round((fin - t) / 30));
       const pas = esHoy && fin <= ahora;
       h += `<div class="fila"><div class="hora">${hhmm(t)}</div><button class="slot bloque ${x.kind} ${pas ? 'pasado' : ''}" style="min-height:calc(var(--row) * ${n} + var(--gap) * ${n - 1})" data-accion="${x.kind}" data-ini="${x.inicio}" data-id="${esc(x.id || '')}">${contenidoBloque(x)}</button></div>`;
-      t = fin;
+      libs.filter(l => l.inicio > t && l.inicio < fin).forEach(l => {
+        h += `<button class="liberado" data-accion="liberado" data-ini="${l.inicio}"><span>✓</span><span><s>${esc(l.etiqueta)}</s> no va este día${l.motivo ? ' (' + esc(l.motivo) + ')' : ''}. Libre para reservar.</span></button>`;
+      });
+      t = Math.ceil(fin / 30) * 30;
       continue;
     }
     const pas = esHoy && t < ahora;
     const cabe = libreHasta(occ, t) - t >= 60;
-    h += `<div class="fila"><div class="hora">${hhmm(t)}</div><button class="slot libre ${pas ? 'pasado' : ''} ${cabe ? '' : 'corto'}" data-accion="libre" data-t="${t}" ${pas ? 'disabled' : ''}><span>${cabe ? 'Libre' : 'Solo 30 min libres'}</span>${cabe ? '<span class="mas" aria-hidden="true">+</span>' : ''}</button></div>`;
+    h += `<div class="fila"><div class="hora">${hhmm(t)}</div><button class="slot libre ${pas ? 'pasado' : ''} ${cabe ? '' : 'corto'}" data-accion="libre" data-t="${t}" ${pas || !cabe ? 'disabled' : ''}><span>${cabe ? 'Libre' : 'Solo 30 min libres'}</span>${cabe ? '<span class="mas" aria-hidden="true">+</span>' : ''}</button></div>`;
     t += 30;
   }
   $('#timeline').innerHTML = h;
@@ -417,7 +436,7 @@ function renderAdmin() {
   let fijos = '';
   E.dias.forEach(d => d.bloques.filter(b => b.tipo === 'FIJO').forEach(b => {
     if (d.fecha === E.hoy && b.fin <= ahora) return;
-    fijos += `<div class="tarjeta"><div><div class="tf">${cap(fechaMedia(d.fecha))}, ${hhmm(b.inicio)} a ${hhmm(b.fin)}</div><div class="tq">${esc(b.etiqueta)}${b.feriado ? ' · <b class="ok">feriado, no va</b>' : b.liberado ? ' · <b class="ok">liberado</b>' : ''}</div></div>${b.feriado ? '' : b.liberado ? `<button class="mini" data-deshacer="${esc(b.excId)}">Deshacer</button>` : `<button class="mini verde" data-liberar="${d.fecha}|${b.inicio}">Liberar</button>`}</div>`;
+    fijos += `<div class="tarjeta"><div><div class="tf">${cap(fechaMedia(d.fecha))}, ${hhmm(b.inicio)} a ${hhmm(b.fin)}</div><div class="tq">${esc(b.etiqueta)}${b.feriado ? ' · <b class="ok">feriado, no va</b>' : b.liberado ? ' · <b class="ok">liberado</b>' : ''}</div></div>${b.feriado ? '' : b.liberado ? `<button class="mini" data-deshacer="${esc(b.excId)}">Deshacer</button>` : `<button class="mini verde" data-liberar="${d.fecha}|${b.inicio}|${b.fin}">Liberar</button>`}</div>`;
   }));
   let bloqueos = '';
   E.dias.forEach(d => d.bloques.filter(b => b.tipo === 'BLOQUEO').forEach(b => {
@@ -528,11 +547,15 @@ function abrirReserva(d, t) {
 function pintarReserva() {
   document.querySelectorAll('#chDur .chip').forEach(c => c.classList.toggle('sel', Number(c.dataset.dur) === R.dur));
   document.querySelectorAll('#chPara .chip').forEach(c => c.classList.toggle('sel', R.panel ? c.dataset.para === '__otro' : norm(c.dataset.para) === norm(R.para)));
-  document.querySelectorAll('#chTodos .chip').forEach(c => c.classList.toggle('sel', norm(c.dataset.pick) === norm(R.para)));
+  document.querySelectorAll('#chTodos .chip').forEach(c => c.classList.toggle('sel', c.dataset.pick === R.para));
   const para = String(R.para).trim();
+  const elegido = !R.panel || E.familia.some(f => f.nombre === para);
+  // Escrito a mano y parecido a alguien de la lista: obliga a tocar el nombre
+  const aMedias = !elegido && para && E.familia.some(f => norm(f.nombre).startsWith(norm(para)));
   const b = $('#btnOk');
-  b.textContent = `Reservar ${hhmm(R.t)} a ${hhmm(R.t + R.dur)}` + (para && norm(para) !== norm(yo) ? ` para ${para}` : '');
-  b.disabled = !para;
+  b.textContent = aMedias ? 'Toca el nombre en la lista'
+    : `Reservar ${hhmm(R.t)} a ${hhmm(R.t + R.dur)}` + (para && norm(para) !== norm(yo) ? ` para ${para}` : '');
+  b.disabled = !para || aMedias;
 }
 async function confirmarReserva() {
   const para = String(R.para).trim();
@@ -580,7 +603,7 @@ function abrirFijo(d, ini) {
   abrirHoja(html);
   if (adminActivo()) {
     $('#btnLib').onclick = async () => {
-      const r = await accion('adminLiberarFijo', { fecha: d.fecha, inicio: ini, motivo: $('#motivo').value }, $('#btnLib'));
+      const r = await accion('adminLiberarFijo', { fecha: d.fecha, inicio: ini, fin: b.fin, motivo: $('#motivo').value }, $('#btnLib'));
       if (!r.ok) { toast(r.msg, 'error'); return; }
       cerrarHoja(); toast(r.msg, 'ok', r.whatsapp);
     };
@@ -679,7 +702,7 @@ function toast(msg, tipo, wsp) {
   el.className = 'toast on' + (tipo === 'error' ? ' error' : '');
   el.innerHTML = `<span>${esc(msg)}</span>${wsp ? `<a href="https://wa.me/?text=${encodeURIComponent(wsp)}" target="_blank" rel="noopener">Avisar al grupo</a>` : ''}`;
   clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => el.classList.remove('on'), wsp ? 9000 : tipo === 'error' ? 6000 : 4000);
+  if (tipo !== 'error') toastTimer = setTimeout(() => el.classList.remove('on'), wsp ? 9000 : 4000);
 }
 $('#toast').addEventListener('click', e => { if (!e.target.closest('a')) $('#toast').classList.remove('on'); });
 
@@ -687,12 +710,12 @@ $('#toast').addEventListener('click', e => { if (!e.target.closest('a')) $('#toa
 $('#btnYo').addEventListener('click', abrirPerfil);
 $('#dias').addEventListener('click', e => {
   const b = e.target.closest('[data-i]'); if (!b) return;
-  diaSel = Number(b.dataset.i); render(); scrollAhora();
+  fechaSel = E.dias[Number(b.dataset.i)].fecha; render(); scrollAhora();
   b.scrollIntoView({ inline: 'center', block: 'nearest', behavior: 'smooth' });
 });
 $('#timeline').addEventListener('click', e => {
   const ir = e.target.closest('[data-ir]');
-  if (ir) { diaSel = Number(ir.dataset.ir); render(); window.scrollTo(0, 0); return; }
+  if (ir) { fechaSel = E.dias[Number(ir.dataset.ir)].fecha; render(); window.scrollTo(0, 0); return; }
   const b = e.target.closest('[data-accion]'); if (!b || b.disabled) return;
   const d = E.dias[diaSel]; const a = b.dataset.accion;
   if (a === 'libre') abrirReserva(d, Number(b.dataset.t));
@@ -711,7 +734,7 @@ $('#vMias').addEventListener('click', async e => {
   const b = e.target.closest('[data-cancel]'); if (!b) return;
   if (!b.classList.contains('confirmar')) {
     b.classList.add('confirmar'); b.textContent = '¿Seguro?';
-    setTimeout(() => { if (document.body.contains(b)) { b.classList.remove('confirmar'); b.textContent = 'Cancelar'; } }, 4000);
+    setTimeout(() => { if (document.body.contains(b)) { b.classList.remove('confirmar'); b.textContent = 'Cancelar'; } }, 10000);
     return;
   }
   const r = await accion('cancelarReserva', { id: b.dataset.cancel }, b);
@@ -729,8 +752,8 @@ $('#vAdmin').addEventListener('click', async e => {
   const b = e.target.closest('button'); if (!b) return;
   let r = null;
   if (b.dataset.liberar) {
-    const [fecha, ini] = b.dataset.liberar.split('|');
-    r = await accion('adminLiberarFijo', { fecha, inicio: Number(ini), motivo: '' }, b);
+    const [fecha, ini, fin] = b.dataset.liberar.split('|');
+    r = await accion('adminLiberarFijo', { fecha, inicio: Number(ini), fin: Number(fin), motivo: '' }, b);
     toast(r.msg, r.ok ? 'ok' : 'error', r.ok ? r.whatsapp : null); return;
   }
   if (b.dataset.deshacer) r = await accion('adminDeshacerLiberacion', { excId: b.dataset.deshacer }, b);
@@ -755,14 +778,16 @@ async function iniciar() {
   const pc = $('#cargando');
   pc.hidden = false;
   $('#cargandoMsg').textContent = 'Un segundo…';
+  const lento = setTimeout(() => { $('#cargandoMsg').textContent = 'La primera vez puede tardar unos segundos…'; }, 4000);
   let r;
-  try { r = await api('getEstado'); } catch (e) { r = { ok: false, msg: 'No hay conexión.' }; }
+  try { r = await api('getEstado'); } catch (e) { r = { ok: false, msg: 'No se pudo conectar. Revisa tu internet.' }; }
+  clearTimeout(lento);
   if (!r || !r.ok) {
     $('#cargandoMsg').innerHTML = `${esc((r && r.msg) || 'No se pudo cargar.')}<br><br><button class="btn primario" id="reintentar">Reintentar</button>`;
     $('#reintentar').onclick = iniciar;
     return;
   }
-  E = r.estado; cargadoEn = Date.now(); ultimoRefresco = Date.now();
+  aplicar(r);
   if (BOOT.yo) {
     const f = E.familia.find(x => norm(x.nombre) === norm(BOOT.yo));
     if (f) { yo = f.nombre; LS.set('cpl_yo', yo); }
