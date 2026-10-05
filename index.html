@@ -218,7 +218,7 @@ const LS = {
 };
 let yo = LS.get('cpl_yo', '');
 let pin = LS.get('cpl_pin', '');
-let recientes = LS.get('cpl_otros', []);
+let recientes = LS.get('cpl_recientes', LS.get('cpl_otros', []));
 let diaSel = 0;
 let vista = 'cancha';
 let R = {};
@@ -461,13 +461,22 @@ function cerrarHoja() { $('#velo').classList.remove('on'); $('#hoja').classList.
 $('#velo').addEventListener('click', cerrarHoja);
 
 function paraOpciones() {
+  // Yo + las últimas personas para las que reservé en este celular + "Otra persona…"
   const lista = [{ v: yo, t: `Yo (${yo})` }];
   const vistos = new Set([norm(yo)]);
-  recientes.concat(E.familia.map(f => f.nombre)).forEach(n => {
-    if (!vistos.has(norm(n))) { vistos.add(norm(n)); lista.push({ v: n, t: n }); }
+  recientes.forEach(n => {
+    if (lista.length < 5 && !vistos.has(norm(n))) { vistos.add(norm(n)); lista.push({ v: n, t: n }); }
   });
   return lista.map(o => `<button class="chip" data-para="${esc(o.v)}">${esc(o.t)}</button>`).join('') +
-    `<button class="chip" data-para="__otro">+ Otro</button>`;
+    `<button class="chip" data-para="__otro">Otra persona…</button>`;
+}
+function chipsTodos(filtro) {
+  const f = norm(filtro);
+  const nombres = E.familia.map(x => x.nombre).filter(n => norm(n) !== norm(yo))
+    .sort((a, b) => a.localeCompare(b, 'es'));
+  const match = nombres.filter(n => !f || norm(n).includes(f));
+  if (!match.length) return `<p class="nota">No está en la lista. Se reservará a nombre de "${esc(String(filtro).trim())}".</p>`;
+  return match.map(n => `<button class="chip" data-pick="${esc(n)}">${esc(n)}</button>`).join('');
 }
 
 function abrirReserva(d, t) {
@@ -475,7 +484,7 @@ function abrirReserva(d, t) {
   const lim = libreHasta(ocupacion(d), t);
   const durs = [60, 90, 120].filter(x => t + x <= lim);
   if (!durs.length) { toast(`Desde las ${hhmm(t)} solo queda media hora libre. Elige otro horario.`, 'error'); return; }
-  R = { fecha: d.fecha, t, dur: durs.includes(90) ? 90 : durs[durs.length - 1], para: yo, otro: false };
+  R = { fecha: d.fecha, t, dur: durs.includes(90) ? 90 : durs[durs.length - 1], para: yo, panel: false };
   abrirHoja(`
     <h2>${cap(fechaMedia(d.fecha))}, ${hhmm(t)}</h2>
     <p class="sub">${cap(fechaLarga(d.fecha))}</p>
@@ -483,32 +492,49 @@ function abrirReserva(d, t) {
     <div class="chips" id="chDur">${durs.map(x => `<button class="chip" data-dur="${x}">${durTxt(x)}</button>`).join('')}</div>
     <p class="lbl">¿Quién juega?</p>
     <div class="chips" id="chPara">${paraOpciones()}</div>
-    <input class="campo" id="otroNom" maxlength="40" placeholder="Nombre, ej: Manuel y un amigo" hidden>
+    <div id="panelOtro" hidden>
+      <input class="campo" id="buscaNom" maxlength="40" autocomplete="off" placeholder="Busca o escribe un nombre">
+      <div class="chips" id="chTodos" style="margin-top:10px"></div>
+    </div>
     <button class="btn primario" id="btnOk"></button>`);
   pintarReserva();
   $('#chDur').onclick = e => { const c = e.target.closest('[data-dur]'); if (!c) return; R.dur = Number(c.dataset.dur); pintarReserva(); };
   $('#chPara').onclick = e => {
     const c = e.target.closest('[data-para]'); if (!c) return;
-    if (c.dataset.para === '__otro') { R.otro = true; R.para = $('#otroNom').value; $('#otroNom').hidden = false; $('#otroNom').focus(); }
-    else { R.otro = false; R.para = c.dataset.para; $('#otroNom').hidden = true; }
+    if (c.dataset.para === '__otro') {
+      R.panel = true; R.para = $('#buscaNom').value.trim();
+      $('#panelOtro').hidden = false; $('#chTodos').innerHTML = chipsTodos($('#buscaNom').value);
+    } else {
+      R.panel = false; R.para = c.dataset.para; $('#panelOtro').hidden = true;
+    }
     pintarReserva();
   };
-  $('#otroNom').oninput = e => { R.para = e.target.value; pintarReserva(); };
+  $('#chTodos').onclick = e => {
+    const c = e.target.closest('[data-pick]'); if (!c) return;
+    R.para = c.dataset.pick; $('#buscaNom').value = ''; $('#chTodos').innerHTML = chipsTodos('');
+    pintarReserva();
+  };
+  $('#buscaNom').oninput = e => {
+    R.para = e.target.value.trim(); $('#chTodos').innerHTML = chipsTodos(e.target.value);
+    pintarReserva();
+  };
   $('#btnOk').onclick = confirmarReserva;
 }
 function pintarReserva() {
   document.querySelectorAll('#chDur .chip').forEach(c => c.classList.toggle('sel', Number(c.dataset.dur) === R.dur));
-  document.querySelectorAll('#chPara .chip').forEach(c => c.classList.toggle('sel', R.otro ? c.dataset.para === '__otro' : norm(c.dataset.para) === norm(R.para)));
+  document.querySelectorAll('#chPara .chip').forEach(c => c.classList.toggle('sel', R.panel ? c.dataset.para === '__otro' : norm(c.dataset.para) === norm(R.para)));
+  document.querySelectorAll('#chTodos .chip').forEach(c => c.classList.toggle('sel', norm(c.dataset.pick) === norm(R.para)));
+  const para = String(R.para).trim();
   const b = $('#btnOk');
-  b.textContent = `Reservar ${hhmm(R.t)} a ${hhmm(R.t + R.dur)}`;
-  b.disabled = !String(R.para).trim();
+  b.textContent = `Reservar ${hhmm(R.t)} a ${hhmm(R.t + R.dur)}` + (para && norm(para) !== norm(yo) ? ` para ${para}` : '');
+  b.disabled = !para;
 }
 async function confirmarReserva() {
   const para = String(R.para).trim();
   if (!para) return;
   const r = await accion('crearReserva', { fecha: R.fecha, inicio: R.t, duracion: R.dur, para }, $('#btnOk'));
   if (!r.ok) { toast(r.msg, 'error'); return; }
-  if (R.otro) { recientes = [para].concat(recientes.filter(n => norm(n) !== norm(para))).slice(0, 4); LS.set('cpl_otros', recientes); }
+  if (norm(para) !== norm(yo)) { recientes = [para].concat(recientes.filter(n => norm(n) !== norm(para))).slice(0, 4); LS.set('cpl_recientes', recientes); }
   cerrarHoja();
   const wsp = `🎾 Reservé la cancha el ${fechaMedia(R.fecha)}, de ${hhmm(R.t)} a ${hhmm(R.t + R.dur)}${norm(para) === norm(yo) ? '' : ', para ' + para}.`;
   toast(r.msg + (r.avisos && r.avisos.length ? ' ' + r.avisos.join(' ') : ''), 'ok', wsp);
@@ -621,9 +647,14 @@ function mostrarQuien() {
   const s = $('#quien');
   s.innerHTML = `<div class="inner"><div class="pelota grande"></div><h2>¿Quién eres?</h2>
     <p class="sub">Se pregunta una sola vez en este celular.</p>
+    ${E.familia.length > 10 ? '<input class="campo" id="buscaYo" autocomplete="off" placeholder="Busca tu nombre">' : ''}
     <div class="grid">${E.familia.map(f => `<button class="nombre" data-n="${esc(f.nombre)}">${esc(f.nombre)}</button>`).join('')}</div>
     <p class="nota">¿No estás en la lista? Pídele a ${esc(nombresAdmin())} que te agregue.</p></div>`;
   s.hidden = false;
+  if ($('#buscaYo')) $('#buscaYo').oninput = e => {
+    const f = norm(e.target.value);
+    s.querySelectorAll('[data-n]').forEach(b => { b.hidden = !!f && !norm(b.dataset.n).includes(f); });
+  };
   s.onclick = e => {
     const b = e.target.closest('[data-n]'); if (!b) return;
     const antes = yo;
