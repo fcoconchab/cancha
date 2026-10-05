@@ -65,6 +65,8 @@ input,select{font:inherit;font-size:16px}
 .dia span{display:block;font-size:19px;font-weight:750;font-variant-numeric:tabular-nums}
 .dia.sel{background:var(--cancha);border-color:var(--cancha);color:#fff}
 .dia.sel b{color:#fff;opacity:.85}
+.dia em{display:block;font-style:normal;font-size:10.5px;font-weight:750;color:var(--bloq-ink);margin-top:1px}
+.dia.sel em{color:var(--pelota)}
 .dia .punto{position:absolute;top:6px;right:7px;width:8px;height:8px;border-radius:50%;background:var(--pelota);box-shadow:0 0 0 1.5px var(--card)}
 
 main{padding:12px 12px 120px;max-width:620px;margin:0 auto}
@@ -315,7 +317,7 @@ function renderDias() {
     const p = partes(d.fecha);
     const arriba = i === 0 ? 'Hoy' : i === 1 ? 'Mañana' : DC[p.dow];
     const mia = d.reservas.some(esMia);
-    return `<button class="dia ${i === diaSel ? 'sel' : ''}" data-i="${i}" aria-label="${esc(fechaLarga(d.fecha))}"><b>${arriba}</b><span>${p.d}</span>${mia ? '<i class="punto"></i>' : ''}</button>`;
+    return `<button class="dia ${i === diaSel ? 'sel' : ''}" data-i="${i}" aria-label="${esc(fechaLarga(d.fecha))}"><b>${arriba}</b><span>${p.d}</span>${d.feriado ? '<em>Feriado</em>' : ''}${mia ? '<i class="punto"></i>' : ''}</button>`;
   }).join('');
 }
 
@@ -350,10 +352,13 @@ function renderTimeline() {
   if (esHoy && ahora >= E.cierre - 30 && E.dias.length > 1) {
     h += `<div class="aviso"><span>Por hoy ya no quedan horarios.</span><button data-ir="1">Ver mañana</button></div>`;
   }
+  if (d.feriado) {
+    h += `<div class="aviso"><span><b>Feriado:</b> ${esc(d.feriado)}. Los horarios fijos no corren este día.</span></div>`;
+  }
   let t = E.apertura;
   while (t < E.cierre) {
     libs.filter(l => l.inicio === t).forEach(l => {
-      h += `<button class="liberado" data-accion="liberado" data-exc="${esc(l.excId)}"><span>✓</span><span><s>${esc(l.etiqueta)}</s> no va este día${l.motivo ? ' (' + esc(l.motivo) + ')' : ''}. Libre para reservar.</span></button>`;
+      h += `<button class="liberado" data-accion="liberado" data-ini="${l.inicio}"><span>✓</span><span><s>${esc(l.etiqueta)}</s> no va este día${l.motivo ? ' (' + esc(l.motivo) + ')' : ''}. Libre para reservar.</span></button>`;
     });
     const x = occ.find(o => o.inicio <= t && o.fin > t);
     if (x) {
@@ -412,7 +417,7 @@ function renderAdmin() {
   let fijos = '';
   E.dias.forEach(d => d.bloques.filter(b => b.tipo === 'FIJO').forEach(b => {
     if (d.fecha === E.hoy && b.fin <= ahora) return;
-    fijos += `<div class="tarjeta"><div><div class="tf">${cap(fechaMedia(d.fecha))}, ${hhmm(b.inicio)} a ${hhmm(b.fin)}</div><div class="tq">${esc(b.etiqueta)}${b.liberado ? ' · <b class="ok">liberado</b>' : ''}</div></div>${b.liberado ? `<button class="mini" data-deshacer="${esc(b.excId)}">Deshacer</button>` : `<button class="mini verde" data-liberar="${d.fecha}|${b.inicio}">Liberar</button>`}</div>`;
+    fijos += `<div class="tarjeta"><div><div class="tf">${cap(fechaMedia(d.fecha))}, ${hhmm(b.inicio)} a ${hhmm(b.fin)}</div><div class="tq">${esc(b.etiqueta)}${b.feriado ? ' · <b class="ok">feriado, no va</b>' : b.liberado ? ' · <b class="ok">liberado</b>' : ''}</div></div>${b.feriado ? '' : b.liberado ? `<button class="mini" data-deshacer="${esc(b.excId)}">Deshacer</button>` : `<button class="mini verde" data-liberar="${d.fecha}|${b.inicio}">Liberar</button>`}</div>`;
   }));
   let bloqueos = '';
   E.dias.forEach(d => d.bloques.filter(b => b.tipo === 'BLOQUEO').forEach(b => {
@@ -582,13 +587,15 @@ function abrirFijo(d, ini) {
   }
 }
 
-function abrirLiberado(d, excId) {
-  const b = d.bloques.find(x => x.tipo === 'FIJO' && x.excId === excId); if (!b) return;
-  let html = `<h2>${esc(b.etiqueta)}</h2><p class="sub">No va el ${fechaMedia(d.fecha)}${b.motivo ? ' (' + esc(b.motivo) + ')' : ''}. De ${hhmm(b.inicio)} a ${hhmm(b.fin)} se puede reservar.</p>`;
-  if (adminActivo()) html += `<button class="btn secundario" id="btnDes">Deshacer: vuelve a ser fijo</button>`;
+function abrirLiberado(d, ini) {
+  const b = d.bloques.find(x => x.tipo === 'FIJO' && x.liberado && x.inicio === ini); if (!b) return;
+  const excId = b.excId;
+  let html = `<h2>${esc(b.etiqueta)}</h2><p class="sub">No va el ${fechaMedia(d.fecha)}${b.feriado ? ' porque es feriado (' + esc(d.feriado) + ')' : (b.motivo ? ' (' + esc(b.motivo) + ')' : '')}. De ${hhmm(b.inicio)} a ${hhmm(b.fin)} se puede reservar.</p>`;
+  if (adminActivo() && excId) html += `<button class="btn secundario" id="btnDes">Deshacer: vuelve a ser fijo</button>`;
+  if (adminActivo() && b.feriado) html += `<p class="nota">Si la clase sí va este feriado, bloquéala desde Admin → Bloquear un horario.</p>`;
   html += `<button class="btn secundario" data-cerrar="1">Cerrar</button>`;
   abrirHoja(html);
-  if (adminActivo()) {
+  if (adminActivo() && excId) {
     $('#btnDes').onclick = async () => {
       const r = await accion('adminDeshacerLiberacion', { excId }, $('#btnDes'));
       if (!r.ok) { toast(r.msg, 'error'); return; }
@@ -692,7 +699,7 @@ $('#timeline').addEventListener('click', e => {
   else if (a === 'res' || a === 'mia') abrirExistente(d, b.dataset.id);
   else if (a === 'fijo') abrirFijo(d, Number(b.dataset.ini));
   else if (a === 'bloqueo') abrirBloqueo(d, b.dataset.id);
-  else if (a === 'liberado') abrirLiberado(d, b.dataset.exc);
+  else if (a === 'liberado') abrirLiberado(d, Number(b.dataset.ini));
 });
 $('#hojaCont').addEventListener('click', e => { if (e.target.closest('[data-cerrar]')) cerrarHoja(); });
 document.querySelectorAll('.tab').forEach(t => t.addEventListener('click', () => {
