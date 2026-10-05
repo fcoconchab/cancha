@@ -1,0 +1,740 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Cancha Pedro Lira</title>
+<meta name="theme-color" content="#1E6A47">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Cancha">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="icon" href="icon-180.png">
+<meta name="color-scheme" content="light dark">
+<style>
+:root{
+  --bg:#F1F4F0; --card:#FFFFFF; --ink:#13241B; --ink2:#5B6C62; --line:#DCE3DA;
+  --cancha:#1E6A47; --cancha-osc:#17553A; --raya:rgba(255,255,255,.75);
+  --verde-suave:#DDEFE4; --verde-texto:#165536;
+  --pelota:#D8EE4C; --pelota-ink:#283208;
+  --fijo:#E8ECE6; --fijo-ink:#56635A;
+  --bloq:#F3E6DC; --bloq-ink:#7B472A;
+  --rojo:#BF3A2B; --wsp:#25D366;
+  --row:54px; --gap:6px;
+  --sombra:0 10px 30px rgba(19,36,27,.16);
+  --font:-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+}
+@media (prefers-color-scheme:dark){
+  :root{
+    --bg:#0E1612; --card:#16211B; --ink:#E7F0EA; --ink2:#98AB9F; --line:#26352C;
+    --cancha:#1B5C3E; --cancha-osc:#154831;
+    --verde-suave:#1B3427; --verde-texto:#93E2B8;
+    --fijo:#202B25; --fijo-ink:#9DACA3; --bloq:#36271E; --bloq-ink:#EDBB98;
+    --sombra:0 10px 30px rgba(0,0,0,.55);
+  }
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font);font-size:16px;line-height:1.35;-webkit-text-size-adjust:100%}
+button{font:inherit;color:inherit;border:0;background:none;cursor:pointer;padding:0}
+button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid var(--pelota);outline-offset:2px}
+input,select{font:inherit;font-size:16px}
+[hidden]{display:none!important}
+
+/* Cabecera: la cancha con su línea lateral */
+.cabecera{position:sticky;top:0;z-index:20}
+.top{background:var(--cancha);color:#fff;padding:calc(14px + env(safe-area-inset-top)) 16px 13px;display:flex;align-items:center;gap:12px;position:relative}
+.top::after{content:"";position:absolute;left:10px;right:10px;bottom:6px;height:2px;background:var(--raya);border-radius:2px}
+.pelota{width:30px;height:30px;border-radius:50%;background:var(--pelota);position:relative;flex:none;overflow:hidden}
+.pelota::before,.pelota::after{content:"";position:absolute;top:-2px;width:30px;height:30px;border:2px solid rgba(255,255,255,.9);border-radius:50%}
+.pelota::before{left:-20px}.pelota::after{right:-20px}
+.pelota.grande{width:56px;height:56px}
+.pelota.grande::before,.pelota.grande::after{width:56px;height:56px;border-width:3px}
+.pelota.grande::before{left:-38px}.pelota.grande::after{right:-38px}
+.titulos{flex:1;min-width:0;cursor:pointer}
+.titulos h1{margin:0;font-size:19px;font-weight:750;letter-spacing:-.015em}
+.titulos p{margin:2px 0 0;font-size:13.5px;opacity:.85;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.yo{background:rgba(255,255,255,.16);color:#fff;border-radius:999px;padding:0 12px;font-size:15px;font-weight:650;min-height:40px;display:flex;align-items:center;gap:6px;white-space:nowrap}
+.yo .adm{font-size:11px;font-weight:750;background:var(--pelota);color:var(--pelota-ink);border-radius:6px;padding:2px 6px}
+
+.dias{display:flex;gap:8px;overflow-x:auto;padding:10px 12px;background:var(--bg);border-bottom:1px solid var(--line);scrollbar-width:none}
+.dias::-webkit-scrollbar{display:none}
+.dia{flex:none;min-width:64px;min-height:56px;padding:6px 10px;border-radius:14px;background:var(--card);border:1.5px solid var(--line);text-align:center;position:relative}
+.dia b{display:block;font-size:13px;font-weight:600;color:var(--ink2)}
+.dia span{display:block;font-size:19px;font-weight:750;font-variant-numeric:tabular-nums}
+.dia.sel{background:var(--cancha);border-color:var(--cancha);color:#fff}
+.dia.sel b{color:#fff;opacity:.85}
+.dia .punto{position:absolute;top:6px;right:7px;width:8px;height:8px;border-radius:50%;background:var(--pelota);box-shadow:0 0 0 1.5px var(--card)}
+
+main{padding:12px 12px 120px;max-width:620px;margin:0 auto}
+.leyenda{display:flex;gap:14px;flex-wrap:wrap;font-size:13px;color:var(--ink2);margin:2px 4px 12px}
+.leyenda i{display:inline-block;width:11px;height:11px;border-radius:3px;margin-right:6px;vertical-align:-1px}
+
+/* Timeline */
+.fila{display:grid;grid-template-columns:50px 1fr;gap:8px;margin-bottom:var(--gap)}
+.hora{font-size:14px;font-variant-numeric:tabular-nums;color:var(--ink2);padding-top:17px;text-align:right}
+.slot{width:100%;min-height:var(--row);border-radius:14px;display:flex;align-items:center;justify-content:space-between;padding:0 14px;text-align:left}
+.libre{background:var(--card);border:1.5px dashed var(--line);font-weight:600;color:var(--ink2)}
+.libre .mas{width:32px;height:32px;border-radius:50%;background:var(--verde-suave);color:var(--verde-texto);display:grid;place-items:center;font-size:22px;font-weight:600;line-height:1}
+.libre:active{border-color:var(--cancha);border-style:solid;transform:scale(.99)}
+.libre.corto{font-weight:500;font-size:14px}
+.bloque{flex-direction:column;align-items:flex-start;justify-content:center;padding:10px 14px;gap:2px}
+.bloque .t1{font-weight:700;font-size:16px}
+.bloque .t2{font-size:13.5px;opacity:.85}
+.fijo{background:var(--fijo);color:var(--fijo-ink)}
+.bloqueo{background:var(--bloq);color:var(--bloq-ink)}
+.res{background:var(--verde-suave);color:var(--verde-texto)}
+.mia{background:var(--pelota);color:var(--pelota-ink)}
+.pasado{opacity:.38;pointer-events:none}
+.liberado{display:flex;gap:8px;align-items:center;width:calc(100% - 58px);margin:0 0 var(--gap) 58px;padding:8px 12px;border-radius:12px;border:1.5px solid var(--verde-suave);color:var(--verde-texto);font-size:13.5px;text-align:left}
+.liberado s{opacity:.8}
+.aviso{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;margin:0 0 12px;display:flex;justify-content:space-between;align-items:center;gap:10px;font-size:15px}
+.aviso button{color:var(--verde-texto);font-weight:700;min-height:40px}
+
+/* Hoja inferior */
+.velo{position:fixed;inset:0;background:rgba(8,18,12,.45);z-index:40;opacity:0;pointer-events:none;transition:opacity .2s}
+.velo.on{opacity:1;pointer-events:auto}
+.hoja{position:fixed;left:0;right:0;bottom:0;z-index:41;background:var(--card);border-radius:22px 22px 0 0;padding:10px 18px calc(18px + env(safe-area-inset-bottom));max-height:90vh;overflow:auto;transform:translateY(105%);transition:transform .26s cubic-bezier(.2,.8,.2,1);box-shadow:var(--sombra);max-width:620px;margin:0 auto}
+.hoja.on{transform:none}
+.asa{width:42px;height:5px;border-radius:3px;background:var(--line);margin:0 auto 14px}
+.hoja h2{margin:0 0 3px;font-size:21px;letter-spacing:-.01em}
+.sub{color:var(--ink2);margin:0 0 6px;font-size:15px}
+.lbl{font-size:15px;font-weight:700;margin:18px 0 9px}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{min-height:46px;padding:0 16px;border-radius:999px;background:var(--bg);border:1.5px solid var(--line);font-weight:650}
+.chip.sel{background:var(--cancha);border-color:var(--cancha);color:#fff}
+.btn{display:flex;align-items:center;justify-content:center;width:100%;min-height:54px;border-radius:15px;font-weight:700;font-size:17px;margin-top:12px}
+.btn.primario{background:var(--cancha);color:#fff;margin-top:22px}
+.btn.primario:disabled{opacity:.45}
+.btn.secundario{background:var(--bg);border:1.5px solid var(--line)}
+.btn.peligro{color:var(--rojo);border:1.5px solid currentColor}
+.btn.peligro.confirmar,.mini.confirmar{background:var(--rojo);color:#fff;border-color:var(--rojo)}
+.cargando{opacity:.75;pointer-events:none}
+.cargando::after{content:"";display:inline-block;width:16px;height:16px;margin-left:10px;border:2.5px solid currentColor;border-right-color:transparent;border-radius:50%;animation:gira .7s linear infinite}
+@keyframes gira{to{transform:rotate(360deg)}}
+.campo{width:100%;min-height:50px;border-radius:13px;border:1.5px solid var(--line);background:var(--bg);color:var(--ink);padding:0 14px;margin-top:10px}
+.nota{color:var(--ink2);font-size:14px;margin:14px 0 0}
+
+/* Toast */
+.toast{position:fixed;left:12px;right:12px;bottom:calc(80px + env(safe-area-inset-bottom));z-index:50;background:#13241B;color:#fff;border-radius:16px;padding:13px 14px 13px 16px;box-shadow:var(--sombra);display:flex;gap:12px;align-items:center;justify-content:space-between;transform:translateY(16px);opacity:0;pointer-events:none;transition:.22s;max-width:596px;margin:0 auto;font-size:15px}
+.toast.on{transform:none;opacity:1;pointer-events:auto}
+.toast.error{background:var(--rojo)}
+.toast a{flex:none;background:var(--wsp);color:#05301A;font-weight:750;border-radius:999px;padding:11px 14px;text-decoration:none;font-size:14px}
+
+/* Barra inferior */
+.tabbar{position:fixed;left:0;right:0;bottom:0;z-index:30;background:var(--card);border-top:1px solid var(--line);display:flex;padding-bottom:env(safe-area-inset-bottom)}
+.tab{flex:1;min-height:62px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;font-size:12.5px;font-weight:650;color:var(--ink2);position:relative}
+.tab svg{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+.tab.sel{color:var(--verde-texto)}
+.tab .badge{position:absolute;top:8px;left:calc(50% + 6px);min-width:18px;height:18px;border-radius:9px;background:var(--pelota);color:var(--pelota-ink);font-size:11px;font-weight:800;display:grid;place-items:center;padding:0 5px}
+
+/* Pantalla ¿Quién eres? */
+.pantalla{position:fixed;inset:0;z-index:60;background:var(--bg);overflow:auto;padding:36px 18px 40px}
+.pantalla .inner{max-width:520px;margin:0 auto}
+.pantalla h2{font-size:28px;margin:20px 0 4px;letter-spacing:-.02em}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:20px}
+.nombre{min-height:60px;border-radius:15px;background:var(--card);border:1.5px solid var(--line);font-size:17px;font-weight:650}
+.nombre:active{background:var(--cancha);color:#fff;border-color:var(--cancha)}
+
+/* Listas */
+.seccion{font-size:17px;font-weight:750;margin:14px 4px 10px}
+.tarjeta{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:13px 14px;margin-bottom:10px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+.tarjeta.propia{border-left:6px solid var(--pelota)}
+.tf{font-weight:700}
+.tq{color:var(--ink2);font-size:14px;margin-top:2px}
+.tq .ok{color:var(--verde-texto)}
+.mini{flex:none;min-height:42px;padding:0 14px;border-radius:12px;font-weight:700;font-size:14px;border:1.5px solid var(--line);background:var(--bg)}
+.mini.verde{background:var(--cancha);border-color:var(--cancha);color:#fff}
+.mini.rojo{color:var(--rojo);border-color:currentColor;background:transparent}
+.cupo{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px;margin-bottom:6px;font-size:15px}
+.vacio{text-align:center;padding:46px 18px;color:var(--ink2)}
+.vacio .pelota{margin:0 auto 14px}
+.vacio h3{color:var(--ink);margin:0 0 6px;font-size:19px}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:14px 14px 16px;margin-bottom:14px}
+.panel h3{margin:0 0 4px;font-size:17px}
+.panel .sub{font-size:14px}
+.dosc{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+
+<div class="cabecera">
+  <header class="top">
+    <div class="pelota" aria-hidden="true"></div>
+    <div class="titulos" id="titulos" title="Actualizar">
+      <h1 id="titulo">Cancha Pedro Lira</h1>
+      <p id="subtitulo"></p>
+    </div>
+    <button class="yo" id="btnYo" aria-label="Mi perfil"></button>
+  </header>
+  <nav class="dias" id="dias" aria-label="Días"></nav>
+</div>
+
+<main id="vCancha">
+  <div class="leyenda">
+    <span><i style="background:var(--card);border:1.5px dashed var(--ink2)"></i>Libre</span>
+    <span><i style="background:var(--pelota)"></i>Tuya</span>
+    <span><i style="background:var(--verde-suave);border:1px solid var(--verde-texto)"></i>Reservada</span>
+    <span><i style="background:var(--fijo);border:1px solid var(--fijo-ink)"></i>Fijo</span>
+  </div>
+  <div id="timeline"></div>
+</main>
+<main id="vMias" hidden></main>
+<main id="vAdmin" hidden></main>
+
+<nav class="tabbar">
+  <button class="tab" data-v="cancha">
+    <svg viewBox="0 0 24 24"><rect x="4" y="2.5" width="16" height="19" rx="1.5"/><path d="M4 12h16M8 2.5v19M16 2.5v19M8 7.5h8M8 16.5h8"/></svg>Cancha
+  </button>
+  <button class="tab" data-v="mias">
+    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M5.6 5.8c3 2.6 3 9.8 0 12.4M18.4 5.8c-3 2.6-3 9.8 0 12.4"/></svg>Mis reservas<span class="badge" id="badge" hidden></span>
+  </button>
+  <button class="tab" data-v="admin" id="tabAdmin" hidden>
+    <svg viewBox="0 0 24 24"><path d="M12 2.8l7.5 3v5.6c0 4.6-3.1 8.4-7.5 9.8-4.4-1.4-7.5-5.2-7.5-9.8V5.8z"/><path d="M8.8 12l2.2 2.2 4.3-4.4"/></svg>Admin
+  </button>
+</nav>
+
+<div class="velo" id="velo"></div>
+<div class="hoja" id="hoja" role="dialog" aria-modal="true"><div class="asa"></div><div id="hojaCont"></div></div>
+<div class="toast" id="toast" role="status"></div>
+<div class="pantalla" id="quien" hidden></div>
+<div class="pantalla" id="cargando"><div class="inner"><div class="pelota grande"></div><h2>Cargando la cancha</h2><p class="sub" id="cargandoMsg">Un segundo…</p></div></div>
+
+<script>
+// URL de la app de Apps Script (la que termina en /exec)
+const API_URL = 'https://script.google.com/macros/s/AKfycbySx6snbU8AkAoFmLXqBLNr2Yogd0tfQhoWQ_0ULIzJaQMLXV3SK3LTp0cSu0HtDHMN/exec';
+const BOOT = { yo: new URLSearchParams(location.search).get('yo') || '' };
+let E = null;
+let cargadoEn = Date.now();
+let ultimoRefresco = Date.now();
+
+const LS = {
+  get(k, d) { try { const v = localStorage.getItem(k); return v === null ? d : JSON.parse(v); } catch (e) { return d; } },
+  set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} },
+  del(k) { try { localStorage.removeItem(k); } catch (e) {} }
+};
+let yo = LS.get('cpl_yo', '');
+let pin = LS.get('cpl_pin', '');
+let recientes = LS.get('cpl_otros', []);
+let diaSel = 0;
+let vista = 'cancha';
+let R = {};
+const FA = { fecha: '', ini: '', fin: '', etiqueta: '', nombre: '' };
+
+const DL = ['domingo','lunes','martes','miércoles','jueves','viernes','sábado'];
+const DP = ['domingos','lunes','martes','miércoles','jueves','viernes','sábados'];
+const DC = ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
+const ML = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+
+const $ = s => document.querySelector(s);
+const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
+const hhmm = m => String(Math.floor(m / 60)).padStart(2, '0') + ':' + String(m % 60).padStart(2, '0');
+const norm = s => String(s || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/\s+/g, ' ').trim();
+const cap = s => s.charAt(0).toUpperCase() + s.slice(1);
+const durTxt = d => d === 60 ? '1 h' : d === 90 ? '1 h 30' : '2 h';
+
+function partes(iso) {
+  const [y, m, d] = iso.split('-').map(Number);
+  return { y, m, d, dow: new Date(Date.UTC(y, m - 1, d, 12)).getUTCDay() };
+}
+function fechaLarga(iso) { const p = partes(iso); return `${DL[p.dow]} ${p.d} de ${ML[p.m - 1]}`; }
+function fechaMedia(iso) { const p = partes(iso); return `${DL[p.dow]} ${p.d}`; }
+function ahoraMin() { return E.ahora + Math.floor((Date.now() - cargadoEn) / 60000); }
+function soyAdmin() { return !!E && E.familia.some(f => f.admin && norm(f.nombre) === norm(yo)); }
+function adminActivo() { return !!pin && soyAdmin(); }
+function esMia(r) { return norm(r.para) === norm(yo) || norm(r.por) === norm(yo); }
+function nombresAdmin() { return E.familia.filter(f => f.admin).map(f => f.nombre).join(' o '); }
+
+/* ---------- servidor ---------- */
+async function api(fn, arg) {
+  // credentials:'omit' evita el problema de Chrome con varias cuentas de Google
+  const r = await fetch(API_URL, {
+    method: 'POST', credentials: 'omit', redirect: 'follow',
+    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+    body: JSON.stringify({ fn: fn, arg: arg === undefined ? null : arg })
+  });
+  if (!r.ok) throw new Error('HTTP ' + r.status);
+  return r.json();
+}
+async function accion(fn, arg, btn) {
+  if (btn) btn.classList.add('cargando');
+  try {
+    const r = await api(fn, Object.assign({ quien: yo, pin: adminActivo() ? pin : '' }, arg));
+    if (r && r.estado) { E = r.estado; cargadoEn = Date.now(); ultimoRefresco = Date.now(); }
+    if (r && !r.ok && /PIN/.test(r.msg)) { pin = ''; LS.del('cpl_pin'); }
+    render();
+    return r || { ok: false, msg: 'Sin respuesta. Intenta de nuevo.' };
+  } catch (e) {
+    return { ok: false, msg: 'No hay conexión. Revisa tu internet e intenta de nuevo.' };
+  } finally {
+    if (btn) btn.classList.remove('cargando');
+  }
+}
+async function refrescar() {
+  try {
+    const r = await api('getEstado');
+    if (r && r.ok) { E = r.estado; cargadoEn = Date.now(); ultimoRefresco = Date.now(); render(); }
+  } catch (e) {}
+}
+document.addEventListener('visibilitychange', () => {
+  if (!document.hidden && Date.now() - ultimoRefresco > 20000) refrescar();
+});
+setInterval(() => {
+  if (document.hidden || !E) return;
+  if (ahoraMin() >= 1440 || Date.now() - ultimoRefresco > 120000) refrescar();
+  else if (vista === 'cancha') renderTimeline();
+}, 60000);
+
+/* ---------- render ---------- */
+function render() {
+  if (!E) return;
+  if (diaSel >= E.dias.length) diaSel = 0;
+  if (vista === 'admin' && !adminActivo()) vista = 'cancha';
+  const p = partes(E.hoy);
+  $('#titulo').textContent = E.nombreApp;
+  $('#subtitulo').textContent = `Hoy ${DL[p.dow]} ${p.d} de ${ML[p.m - 1]}`;
+  $('#btnYo').innerHTML = `${esc(yo || 'Elegir')}${adminActivo() ? ' <span class="adm">ADMIN</span>' : ''} <span aria-hidden="true">▾</span>`;
+  $('#dias').hidden = vista !== 'cancha';
+  $('#tabAdmin').hidden = !adminActivo();
+  document.querySelectorAll('.tab').forEach(t => t.classList.toggle('sel', t.dataset.v === vista));
+  $('#vCancha').hidden = vista !== 'cancha';
+  $('#vMias').hidden = vista !== 'mias';
+  $('#vAdmin').hidden = vista !== 'admin';
+  const n = misFuturas().length;
+  $('#badge').hidden = !n; $('#badge').textContent = n;
+  if (vista === 'cancha') { renderDias(); renderTimeline(); }
+  else if (vista === 'mias') renderMias();
+  else renderAdmin();
+}
+
+function renderDias() {
+  $('#dias').innerHTML = E.dias.map((d, i) => {
+    const p = partes(d.fecha);
+    const arriba = i === 0 ? 'Hoy' : i === 1 ? 'Mañana' : DC[p.dow];
+    const mia = d.reservas.some(esMia);
+    return `<button class="dia ${i === diaSel ? 'sel' : ''}" data-i="${i}" aria-label="${esc(fechaLarga(d.fecha))}"><b>${arriba}</b><span>${p.d}</span>${mia ? '<i class="punto"></i>' : ''}</button>`;
+  }).join('');
+}
+
+function ocupacion(d) {
+  const o = [];
+  d.bloques.forEach(b => { if (!(b.tipo === 'FIJO' && b.liberado)) o.push(Object.assign({ kind: b.tipo === 'FIJO' ? 'fijo' : 'bloqueo' }, b)); });
+  d.reservas.forEach(r => o.push(Object.assign({ kind: esMia(r) ? 'mia' : 'res' }, r)));
+  return o.sort((a, b) => a.inicio - b.inicio);
+}
+function libreHasta(occ, t) {
+  let lim = E.cierre;
+  occ.forEach(x => { if (x.inicio > t && x.inicio < lim) lim = x.inicio; });
+  return lim;
+}
+
+function contenidoBloque(x) {
+  const rango = `${hhmm(x.inicio)} a ${hhmm(x.fin)}`;
+  if (x.kind === 'fijo') return `<span class="t1">${esc(x.etiqueta)}</span><span class="t2">${rango}, horario fijo</span>`;
+  if (x.kind === 'bloqueo') return `<span class="t1">${esc(x.etiqueta)}</span><span class="t2">${rango}, bloqueado</span>`;
+  const quien = (x.kind === 'mia' && norm(x.para) === norm(yo)) ? 'Tú' : esc(x.para);
+  const por = norm(x.para) === norm(x.por) ? '' : (norm(x.por) === norm(yo) ? ' · la reservaste tú' : ` · reservó ${esc(x.por)}`);
+  return `<span class="t1">${quien}</span><span class="t2">${rango}${por}</span>`;
+}
+
+function renderTimeline() {
+  const d = E.dias[diaSel];
+  const esHoy = d.fecha === E.hoy;
+  const ahora = ahoraMin();
+  const occ = ocupacion(d);
+  const libs = d.bloques.filter(b => b.tipo === 'FIJO' && b.liberado);
+  let h = '';
+  if (esHoy && ahora >= E.cierre - 30 && E.dias.length > 1) {
+    h += `<div class="aviso"><span>Por hoy ya no quedan horarios.</span><button data-ir="1">Ver mañana</button></div>`;
+  }
+  let t = E.apertura;
+  while (t < E.cierre) {
+    libs.filter(l => l.inicio === t).forEach(l => {
+      h += `<button class="liberado" data-accion="liberado" data-exc="${esc(l.excId)}"><span>✓</span><span><s>${esc(l.etiqueta)}</s> no va este día${l.motivo ? ' (' + esc(l.motivo) + ')' : ''}. Libre para reservar.</span></button>`;
+    });
+    const x = occ.find(o => o.inicio <= t && o.fin > t);
+    if (x) {
+      const fin = Math.min(x.fin, E.cierre);
+      const n = Math.max(1, Math.round((fin - t) / 30));
+      const pas = esHoy && fin <= ahora;
+      h += `<div class="fila"><div class="hora">${hhmm(t)}</div><button class="slot bloque ${x.kind} ${pas ? 'pasado' : ''}" style="min-height:calc(var(--row) * ${n} + var(--gap) * ${n - 1})" data-accion="${x.kind}" data-ini="${x.inicio}" data-id="${esc(x.id || '')}">${contenidoBloque(x)}</button></div>`;
+      t = fin;
+      continue;
+    }
+    const pas = esHoy && t < ahora;
+    const cabe = libreHasta(occ, t) - t >= 60;
+    h += `<div class="fila"><div class="hora">${hhmm(t)}</div><button class="slot libre ${pas ? 'pasado' : ''} ${cabe ? '' : 'corto'}" data-accion="libre" data-t="${t}" ${pas ? 'disabled' : ''}><span>${cabe ? 'Libre' : 'Solo 30 min libres'}</span>${cabe ? '<span class="mas" aria-hidden="true">+</span>' : ''}</button></div>`;
+    t += 30;
+  }
+  $('#timeline').innerHTML = h;
+}
+
+function scrollAhora() {
+  if (diaSel !== 0) { window.scrollTo(0, 0); return; }
+  const el = document.querySelector('#timeline .slot:not(.pasado)');
+  if (!el) return;
+  const y = el.getBoundingClientRect().top + window.scrollY - document.querySelector('.cabecera').offsetHeight - 50;
+  window.scrollTo(0, Math.max(0, y));
+}
+
+function misFuturas() {
+  if (!E || !yo) return [];
+  const ahora = ahoraMin(); const out = [];
+  E.dias.forEach(d => d.reservas.forEach(r => {
+    if (esMia(r) && (d.fecha > E.hoy || r.fin > ahora)) out.push({ d, r });
+  }));
+  return out;
+}
+
+function renderMias() {
+  const items = misFuturas();
+  const propias = items.filter(x => norm(x.r.para) === norm(yo)).length;
+  const quedan = Math.max(0, E.maxRes - propias);
+  if (!items.length) {
+    $('#vMias').innerHTML = `<div class="vacio"><div class="pelota grande"></div><h3>No tienes reservas</h3><p>Las que hagas para ti o para otros van a aparecer aquí.</p><button class="btn primario" data-ir-cancha="1">Ver horarios libres</button></div>`;
+    return;
+  }
+  $('#vMias').innerHTML =
+    `<div class="cupo">Puedes tener hasta ${E.maxRes} reservas a la vez. ${quedan ? `Te ${quedan === 1 ? 'queda' : 'quedan'} <b>${quedan}</b>.` : '<b>Ya usaste tus cupos.</b>'}</div>` +
+    `<div class="seccion">Próximas</div>` +
+    items.map(({ d, r }) => {
+      const juegoYo = norm(r.para) === norm(yo);
+      const sub = (juegoYo ? 'Juegas tú' : 'Para ' + esc(r.para)) + (norm(r.por) !== norm(yo) ? `, reservó ${esc(r.por)}` : '');
+      return `<div class="tarjeta ${juegoYo ? 'propia' : ''}"><div><div class="tf">${cap(fechaMedia(d.fecha))}, ${hhmm(r.inicio)} a ${hhmm(r.fin)}</div><div class="tq">${sub}</div></div><button class="mini rojo" data-cancel="${esc(r.id)}">Cancelar</button></div>`;
+    }).join('');
+}
+
+function renderAdmin() {
+  const ahora = ahoraMin();
+  let fijos = '';
+  E.dias.forEach(d => d.bloques.filter(b => b.tipo === 'FIJO').forEach(b => {
+    if (d.fecha === E.hoy && b.fin <= ahora) return;
+    fijos += `<div class="tarjeta"><div><div class="tf">${cap(fechaMedia(d.fecha))}, ${hhmm(b.inicio)} a ${hhmm(b.fin)}</div><div class="tq">${esc(b.etiqueta)}${b.liberado ? ' · <b class="ok">liberado</b>' : ''}</div></div>${b.liberado ? `<button class="mini" data-deshacer="${esc(b.excId)}">Deshacer</button>` : `<button class="mini verde" data-liberar="${d.fecha}|${b.inicio}">Liberar</button>`}</div>`;
+  }));
+  let bloqueos = '';
+  E.dias.forEach(d => d.bloques.filter(b => b.tipo === 'BLOQUEO').forEach(b => {
+    bloqueos += `<div class="tarjeta"><div><div class="tf">${cap(fechaMedia(d.fecha))}, ${hhmm(b.inicio)} a ${hhmm(b.fin)}</div><div class="tq">${esc(b.etiqueta)}</div></div><button class="mini rojo" data-quitar="${esc(b.id)}">Quitar</button></div>`;
+  }));
+  const horas = []; for (let t = E.apertura; t <= E.cierre; t += 30) horas.push(t);
+  if (!FA.fecha || !E.dias.some(d => d.fecha === FA.fecha)) FA.fecha = E.dias[0].fecha;
+  if (FA.ini === '') FA.ini = String(E.apertura);
+  if (FA.fin === '') FA.fin = String(Math.min(E.apertura + 60, E.cierre));
+  const opt = (v, txt, sel) => `<option value="${v}" ${String(v) === String(sel) ? 'selected' : ''}>${txt}</option>`;
+
+  $('#vAdmin').innerHTML = `
+    <div class="panel">
+      <h3>Horarios fijos de los próximos días</h3>
+      <p class="sub">Libera un día puntual (feriado, profe enfermo). El fijo vuelve solo la semana siguiente.</p>
+      ${fijos || '<p class="nota">No hay fijos en estos días.</p>'}
+    </div>
+    <div class="panel">
+      <h3>Bloquear un horario</h3>
+      <p class="sub">Para mantención, un torneo o lo que sea. Nadie podrá reservar ahí.</p>
+      <select class="campo" id="aFecha">${E.dias.map(d => opt(d.fecha, cap(fechaMedia(d.fecha)), FA.fecha)).join('')}</select>
+      <div class="dosc">
+        <select class="campo" id="aIni" aria-label="Desde">${horas.slice(0, -1).map(t => opt(t, 'Desde ' + hhmm(t), FA.ini)).join('')}</select>
+        <select class="campo" id="aFin" aria-label="Hasta">${horas.slice(1).map(t => opt(t, 'Hasta ' + hhmm(t), FA.fin)).join('')}</select>
+      </div>
+      <input class="campo" id="aEtiq" maxlength="60" placeholder="Motivo, ej: Mantención cancha" value="${esc(FA.etiqueta)}">
+      <button class="btn primario" id="aBloquear">Bloquear horario</button>
+      ${bloqueos ? `<div class="seccion">Bloqueos activos</div>${bloqueos}` : ''}
+    </div>
+    <div class="panel">
+      <h3>Agregar persona a la lista</h3>
+      <p class="sub">Aparece en "¿Quién eres?" y en "¿Quién juega?".</p>
+      <input class="campo" id="aNombre" maxlength="40" placeholder="Nombre" value="${esc(FA.nombre)}">
+      <button class="btn secundario" id="aPersona">Agregar</button>
+    </div>
+    <button class="btn secundario" id="aSalir">Salir de modo admin</button>`;
+}
+
+/* ---------- hoja inferior ---------- */
+function abrirHoja(html) {
+  $('#hojaCont').innerHTML = html;
+  $('#velo').classList.add('on'); $('#hoja').classList.add('on');
+  $('#hoja').scrollTop = 0;
+}
+function cerrarHoja() { $('#velo').classList.remove('on'); $('#hoja').classList.remove('on'); }
+$('#velo').addEventListener('click', cerrarHoja);
+
+function paraOpciones() {
+  const lista = [{ v: yo, t: `Yo (${yo})` }];
+  const vistos = new Set([norm(yo)]);
+  recientes.concat(E.familia.map(f => f.nombre)).forEach(n => {
+    if (!vistos.has(norm(n))) { vistos.add(norm(n)); lista.push({ v: n, t: n }); }
+  });
+  return lista.map(o => `<button class="chip" data-para="${esc(o.v)}">${esc(o.t)}</button>`).join('') +
+    `<button class="chip" data-para="__otro">+ Otro</button>`;
+}
+
+function abrirReserva(d, t) {
+  if (!yo) { mostrarQuien(); return; }
+  const lim = libreHasta(ocupacion(d), t);
+  const durs = [60, 90, 120].filter(x => t + x <= lim);
+  if (!durs.length) { toast(`Desde las ${hhmm(t)} solo queda media hora libre. Elige otro horario.`, 'error'); return; }
+  R = { fecha: d.fecha, t, dur: durs.includes(90) ? 90 : durs[durs.length - 1], para: yo, otro: false };
+  abrirHoja(`
+    <h2>${cap(fechaMedia(d.fecha))}, ${hhmm(t)}</h2>
+    <p class="sub">${cap(fechaLarga(d.fecha))}</p>
+    <p class="lbl">¿Cuánto rato?</p>
+    <div class="chips" id="chDur">${durs.map(x => `<button class="chip" data-dur="${x}">${durTxt(x)}</button>`).join('')}</div>
+    <p class="lbl">¿Quién juega?</p>
+    <div class="chips" id="chPara">${paraOpciones()}</div>
+    <input class="campo" id="otroNom" maxlength="40" placeholder="Nombre, ej: Manuel y un amigo" hidden>
+    <button class="btn primario" id="btnOk"></button>`);
+  pintarReserva();
+  $('#chDur').onclick = e => { const c = e.target.closest('[data-dur]'); if (!c) return; R.dur = Number(c.dataset.dur); pintarReserva(); };
+  $('#chPara').onclick = e => {
+    const c = e.target.closest('[data-para]'); if (!c) return;
+    if (c.dataset.para === '__otro') { R.otro = true; R.para = $('#otroNom').value; $('#otroNom').hidden = false; $('#otroNom').focus(); }
+    else { R.otro = false; R.para = c.dataset.para; $('#otroNom').hidden = true; }
+    pintarReserva();
+  };
+  $('#otroNom').oninput = e => { R.para = e.target.value; pintarReserva(); };
+  $('#btnOk').onclick = confirmarReserva;
+}
+function pintarReserva() {
+  document.querySelectorAll('#chDur .chip').forEach(c => c.classList.toggle('sel', Number(c.dataset.dur) === R.dur));
+  document.querySelectorAll('#chPara .chip').forEach(c => c.classList.toggle('sel', R.otro ? c.dataset.para === '__otro' : norm(c.dataset.para) === norm(R.para)));
+  const b = $('#btnOk');
+  b.textContent = `Reservar ${hhmm(R.t)} a ${hhmm(R.t + R.dur)}`;
+  b.disabled = !String(R.para).trim();
+}
+async function confirmarReserva() {
+  const para = String(R.para).trim();
+  if (!para) return;
+  const r = await accion('crearReserva', { fecha: R.fecha, inicio: R.t, duracion: R.dur, para }, $('#btnOk'));
+  if (!r.ok) { toast(r.msg, 'error'); return; }
+  if (R.otro) { recientes = [para].concat(recientes.filter(n => norm(n) !== norm(para))).slice(0, 4); LS.set('cpl_otros', recientes); }
+  cerrarHoja();
+  const wsp = `🎾 Reservé la cancha el ${fechaMedia(R.fecha)}, de ${hhmm(R.t)} a ${hhmm(R.t + R.dur)}${norm(para) === norm(yo) ? '' : ', para ' + para}.`;
+  toast(r.msg + (r.avisos && r.avisos.length ? ' ' + r.avisos.join(' ') : ''), 'ok', wsp);
+}
+
+function armarCancelar(btn, id, textoConfirmar) {
+  btn.onclick = async () => {
+    if (!btn.classList.contains('confirmar')) { btn.classList.add('confirmar'); btn.textContent = textoConfirmar || 'Sí, cancelar'; return; }
+    const r = await accion('cancelarReserva', { id }, btn);
+    if (!r.ok) { toast(r.msg, 'error'); return; }
+    cerrarHoja(); toast(r.msg);
+  };
+}
+
+function abrirExistente(d, id) {
+  const r = d.reservas.find(x => x.id === id); if (!r) return;
+  const puede = adminActivo() || esMia(r);
+  const por = norm(r.por) !== norm(r.para) ? `<br>Reservó ${esc(r.por)}` : '';
+  abrirHoja(`
+    <h2>${esc(r.para)}</h2>
+    <p class="sub">${cap(fechaLarga(d.fecha))}, ${hhmm(r.inicio)} a ${hhmm(r.fin)}${por}</p>
+    ${puede ? '<button class="btn peligro" id="btnCanc">Cancelar reserva</button>' : `<p class="nota">Si necesitas este horario, habla con ${esc(r.por)}.</p>`}
+    <button class="btn secundario" data-cerrar="1">Cerrar</button>`);
+  if (puede) armarCancelar($('#btnCanc'), id);
+}
+
+function abrirFijo(d, ini) {
+  const b = d.bloques.find(x => x.tipo === 'FIJO' && x.inicio === ini); if (!b) return;
+  const p = partes(d.fecha);
+  let html = `<h2>${esc(b.etiqueta)}</h2><p class="sub">Todos los ${DP[p.dow]}, ${hhmm(b.inicio)} a ${hhmm(b.fin)}. Es un horario fijo, no se puede reservar.</p>`;
+  if (adminActivo()) {
+    html += `<input class="campo" id="motivo" maxlength="80" placeholder="Motivo (opcional), ej: fin de semana largo">
+      <button class="btn primario" id="btnLib">Liberar solo el ${fechaMedia(d.fecha)}</button>`;
+  } else if (soyAdmin()) {
+    html += `<p class="nota">Para liberarlo un día, entra como admin tocando tu nombre arriba.</p>`;
+  }
+  html += `<button class="btn secundario" data-cerrar="1">Cerrar</button>`;
+  abrirHoja(html);
+  if (adminActivo()) {
+    $('#btnLib').onclick = async () => {
+      const r = await accion('adminLiberarFijo', { fecha: d.fecha, inicio: ini, motivo: $('#motivo').value }, $('#btnLib'));
+      if (!r.ok) { toast(r.msg, 'error'); return; }
+      cerrarHoja(); toast(r.msg, 'ok', r.whatsapp);
+    };
+  }
+}
+
+function abrirLiberado(d, excId) {
+  const b = d.bloques.find(x => x.tipo === 'FIJO' && x.excId === excId); if (!b) return;
+  let html = `<h2>${esc(b.etiqueta)}</h2><p class="sub">No va el ${fechaMedia(d.fecha)}${b.motivo ? ' (' + esc(b.motivo) + ')' : ''}. De ${hhmm(b.inicio)} a ${hhmm(b.fin)} se puede reservar.</p>`;
+  if (adminActivo()) html += `<button class="btn secundario" id="btnDes">Deshacer: vuelve a ser fijo</button>`;
+  html += `<button class="btn secundario" data-cerrar="1">Cerrar</button>`;
+  abrirHoja(html);
+  if (adminActivo()) {
+    $('#btnDes').onclick = async () => {
+      const r = await accion('adminDeshacerLiberacion', { excId }, $('#btnDes'));
+      if (!r.ok) { toast(r.msg, 'error'); return; }
+      cerrarHoja(); toast(r.msg);
+    };
+  }
+}
+
+function abrirBloqueo(d, id) {
+  const b = d.bloques.find(x => x.tipo === 'BLOQUEO' && x.id === id); if (!b) return;
+  let html = `<h2>${esc(b.etiqueta)}</h2><p class="sub">${cap(fechaLarga(d.fecha))}, ${hhmm(b.inicio)} a ${hhmm(b.fin)}. Cancha bloqueada.</p>`;
+  if (adminActivo()) html += `<button class="btn peligro" id="btnQuitar">Quitar bloqueo</button>`;
+  html += `<button class="btn secundario" data-cerrar="1">Cerrar</button>`;
+  abrirHoja(html);
+  if (adminActivo()) {
+    $('#btnQuitar').onclick = async () => {
+      const r = await accion('adminQuitarBloqueo', { id }, $('#btnQuitar'));
+      if (!r.ok) { toast(r.msg, 'error'); return; }
+      cerrarHoja(); toast(r.msg);
+    };
+  }
+}
+
+function abrirPerfil() {
+  if (!yo) { mostrarQuien(); return; }
+  let html = `<h2>${esc(yo)}</h2><p class="sub">${adminActivo() ? 'Modo admin activo en este celular.' : 'Este celular reserva como ' + esc(yo) + '.'}</p>
+    <button class="btn secundario" id="pCambiar">Cambiar de persona</button>`;
+  if (soyAdmin() && !adminActivo()) {
+    html += `<p class="lbl">Entrar como admin</p>
+      <input class="campo" id="pPin" type="password" inputmode="numeric" autocomplete="off" placeholder="PIN de admin">
+      <button class="btn primario" id="pEntrar">Entrar como admin</button>`;
+  }
+  if (adminActivo()) html += `<button class="btn secundario" id="pSalir">Salir de modo admin</button>`;
+  abrirHoja(html);
+  $('#pCambiar').onclick = () => { cerrarHoja(); mostrarQuien(); };
+  if ($('#pSalir')) $('#pSalir').onclick = () => { salirAdmin(); cerrarHoja(); };
+  if ($('#pEntrar')) {
+    const entrar = async () => {
+      const b = $('#pEntrar'); const v = $('#pPin').value.trim();
+      if (!v) return;
+      b.classList.add('cargando');
+      let r;
+      try { r = await api('verificarPin', v); } catch (e) { r = { ok: false, msg: 'No hay conexión.' }; }
+      b.classList.remove('cargando');
+      if (!r.ok) { toast(r.msg, 'error'); return; }
+      pin = v; LS.set('cpl_pin', pin); cerrarHoja(); render();
+      toast('Modo admin activo. Toca un horario fijo para liberarlo, o usa la pestaña Admin.');
+    };
+    $('#pEntrar').onclick = entrar;
+    $('#pPin').onkeydown = e => { if (e.key === 'Enter') entrar(); };
+  }
+}
+function salirAdmin() { pin = ''; LS.del('cpl_pin'); if (vista === 'admin') vista = 'cancha'; render(); toast('Saliste del modo admin.'); }
+
+function mostrarQuien() {
+  const s = $('#quien');
+  s.innerHTML = `<div class="inner"><div class="pelota grande"></div><h2>¿Quién eres?</h2>
+    <p class="sub">Se pregunta una sola vez en este celular.</p>
+    <div class="grid">${E.familia.map(f => `<button class="nombre" data-n="${esc(f.nombre)}">${esc(f.nombre)}</button>`).join('')}</div>
+    <p class="nota">¿No estás en la lista? Pídele a ${esc(nombresAdmin())} que te agregue.</p></div>`;
+  s.hidden = false;
+  s.onclick = e => {
+    const b = e.target.closest('[data-n]'); if (!b) return;
+    const antes = yo;
+    yo = b.dataset.n; LS.set('cpl_yo', yo);
+    if (norm(antes) !== norm(yo)) { pin = ''; LS.del('cpl_pin'); }
+    s.hidden = true; render(); scrollAhora();
+    toast(`Hola ${yo}. Toca un horario libre para reservar.`);
+  };
+}
+
+/* ---------- toast ---------- */
+let toastTimer;
+function toast(msg, tipo, wsp) {
+  const el = $('#toast');
+  el.className = 'toast on' + (tipo === 'error' ? ' error' : '');
+  el.innerHTML = `<span>${esc(msg)}</span>${wsp ? `<a href="https://wa.me/?text=${encodeURIComponent(wsp)}" target="_blank" rel="noopener">Avisar al grupo</a>` : ''}`;
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => el.classList.remove('on'), wsp ? 9000 : tipo === 'error' ? 6000 : 4000);
+}
+$('#toast').addEventListener('click', e => { if (!e.target.closest('a')) $('#toast').classList.remove('on'); });
+
+/* ---------- eventos ---------- */
+$('#btnYo').addEventListener('click', abrirPerfil);
+$('#dias').addEventListener('click', e => {
+  const b = e.target.closest('[data-i]'); if (!b) return;
+  diaSel = Number(b.dataset.i); render(); scrollAhora();
+  b.scrollIntoView({ inline: 'center', block: 'nearest', behavior: 'smooth' });
+});
+$('#timeline').addEventListener('click', e => {
+  const ir = e.target.closest('[data-ir]');
+  if (ir) { diaSel = Number(ir.dataset.ir); render(); window.scrollTo(0, 0); return; }
+  const b = e.target.closest('[data-accion]'); if (!b || b.disabled) return;
+  const d = E.dias[diaSel]; const a = b.dataset.accion;
+  if (a === 'libre') abrirReserva(d, Number(b.dataset.t));
+  else if (a === 'res' || a === 'mia') abrirExistente(d, b.dataset.id);
+  else if (a === 'fijo') abrirFijo(d, Number(b.dataset.ini));
+  else if (a === 'bloqueo') abrirBloqueo(d, b.dataset.id);
+  else if (a === 'liberado') abrirLiberado(d, b.dataset.exc);
+});
+$('#hojaCont').addEventListener('click', e => { if (e.target.closest('[data-cerrar]')) cerrarHoja(); });
+document.querySelectorAll('.tab').forEach(t => t.addEventListener('click', () => {
+  vista = t.dataset.v; render(); window.scrollTo(0, 0);
+  if (vista === 'cancha') scrollAhora();
+}));
+$('#vMias').addEventListener('click', async e => {
+  if (e.target.closest('[data-ir-cancha]')) { vista = 'cancha'; render(); scrollAhora(); return; }
+  const b = e.target.closest('[data-cancel]'); if (!b) return;
+  if (!b.classList.contains('confirmar')) {
+    b.classList.add('confirmar'); b.textContent = '¿Seguro?';
+    setTimeout(() => { if (document.body.contains(b)) { b.classList.remove('confirmar'); b.textContent = 'Cancelar'; } }, 4000);
+    return;
+  }
+  const r = await accion('cancelarReserva', { id: b.dataset.cancel }, b);
+  toast(r.msg, r.ok ? 'ok' : 'error');
+});
+$('#vAdmin').addEventListener('input', e => {
+  const m = { aFecha: 'fecha', aIni: 'ini', aFin: 'fin', aEtiq: 'etiqueta', aNombre: 'nombre' }[e.target.id];
+  if (m) FA[m] = e.target.value;
+});
+$('#vAdmin').addEventListener('change', e => {
+  const m = { aFecha: 'fecha', aIni: 'ini', aFin: 'fin' }[e.target.id];
+  if (m) FA[m] = e.target.value;
+});
+$('#vAdmin').addEventListener('click', async e => {
+  const b = e.target.closest('button'); if (!b) return;
+  let r = null;
+  if (b.dataset.liberar) {
+    const [fecha, ini] = b.dataset.liberar.split('|');
+    r = await accion('adminLiberarFijo', { fecha, inicio: Number(ini), motivo: '' }, b);
+    toast(r.msg, r.ok ? 'ok' : 'error', r.ok ? r.whatsapp : null); return;
+  }
+  if (b.dataset.deshacer) r = await accion('adminDeshacerLiberacion', { excId: b.dataset.deshacer }, b);
+  else if (b.dataset.quitar) r = await accion('adminQuitarBloqueo', { id: b.dataset.quitar }, b);
+  else if (b.id === 'aBloquear') {
+    const ini = Number(FA.ini), fin = Number(FA.fin);
+    if (fin <= ini) { toast('La hora de término debe ser después del inicio.', 'error'); return; }
+    r = await accion('adminBloquear', { fecha: FA.fecha, inicio: ini, fin, etiqueta: FA.etiqueta || 'Bloqueado' }, b);
+    if (r.ok) { FA.etiqueta = ''; render(); }
+  } else if (b.id === 'aPersona') {
+    if (!FA.nombre.trim()) { toast('Escribe un nombre.', 'error'); return; }
+    r = await accion('adminAgregarPersona', { nombre: FA.nombre }, b);
+    if (r.ok) { FA.nombre = ''; render(); }
+  } else if (b.id === 'aSalir') { salirAdmin(); return; }
+  if (r) toast(r.msg, r.ok ? 'ok' : 'error');
+});
+
+/* ---------- inicio ---------- */
+$('#titulos').addEventListener('click', async () => { await refrescar(); toast('Actualizado.'); });
+
+async function iniciar() {
+  const pc = $('#cargando');
+  pc.hidden = false;
+  $('#cargandoMsg').textContent = 'Un segundo…';
+  let r;
+  try { r = await api('getEstado'); } catch (e) { r = { ok: false, msg: 'No hay conexión.' }; }
+  if (!r || !r.ok) {
+    $('#cargandoMsg').innerHTML = `${esc((r && r.msg) || 'No se pudo cargar.')}<br><br><button class="btn primario" id="reintentar">Reintentar</button>`;
+    $('#reintentar').onclick = iniciar;
+    return;
+  }
+  E = r.estado; cargadoEn = Date.now(); ultimoRefresco = Date.now();
+  if (BOOT.yo) {
+    const f = E.familia.find(x => norm(x.nombre) === norm(BOOT.yo));
+    if (f) { yo = f.nombre; LS.set('cpl_yo', yo); }
+  }
+  if (yo && !E.familia.some(f => norm(f.nombre) === norm(yo))) yo = '';
+  pc.hidden = true;
+  render();
+  if (!yo) mostrarQuien(); else scrollAhora();
+}
+iniciar();
+</script>
+</body>
+</html>
