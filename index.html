@@ -187,17 +187,17 @@ main{padding:14px 12px 120px;max-width:620px;margin:0 auto}
 .panel .sub{font-size:15px}
 .dosc{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 
-/* Clima (Open-Meteo). Si no carga, nada de esto aparece */
+/* Clima (Open-Meteo). Solo importa la lluvia. Si no carga, nada de esto aparece */
 :root{--lluvia-bg:#DCEBFA;--lluvia-ink:#1B4F8F}
 @media (prefers-color-scheme:dark){:root{--lluvia-bg:#1A2C42;--lluvia-ink:#A9CFF8}}
 .ic{width:1em;height:1em;flex:none;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
 .dia .clima{display:flex;align-items:center;justify-content:center;gap:2px;height:16px;font-style:normal;font-size:13px;font-weight:700;line-height:16px;font-variant-numeric:tabular-nums}
-.climadia{display:flex;align-items:center;gap:6px;margin:4px 0 0;color:var(--ink2);font-size:15px;font-weight:600}
+.climadia{display:flex;align-items:center;flex-wrap:wrap;gap:6px;margin:4px 0 0;color:var(--ink2);font-size:15px;font-weight:600}
 .climadia .ic{font-size:19px}
-.tclima{flex:none;display:inline-flex;align-items:center;gap:5px;color:var(--ink2);font-size:15px;font-weight:600;font-variant-numeric:tabular-nums}
-.tclima .ic{font-size:18px}
-.tclima .moja{display:inline-flex;align-items:center;gap:4px;background:var(--lluvia-bg);color:var(--lluvia-ink);border-radius:999px;padding:3px 9px 3px 7px;font-weight:750}
-.bloque .tclima{color:inherit}
+.climadia .moja{color:var(--lluvia-ink);font-weight:750}
+.actualizado{margin:2px 0 0;color:var(--ink2);font-size:13px}
+.lluvia{flex:none;display:inline-flex;align-items:center;gap:4px;background:var(--lluvia-bg);color:var(--lluvia-ink);border-radius:999px;padding:4px 10px 4px 8px;font-size:15px;font-weight:750;white-space:nowrap}
+.lluvia .ic{font-size:18px}
 
 @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
 </style>
@@ -341,8 +341,12 @@ setInterval(() => {
 }, 60000);
 
 /* ---------- clima (Open-Meteo, sin API key) ---------- */
-// Una llamada al cargar y al refrescar, máx. 1 cada 30 min. Si falla o tarda más de 6 s, no se muestra nada.
-const CLIMA_URL = 'https://api.open-meteo.com/v1/forecast?latitude=-33.355&longitude=-70.525&hourly=temperature_2m,precipitation_probability,weather_code&daily=temperature_2m_max,temperature_2m_min,precipitation_probability_max,weather_code&timezone=America%2FSantiago&forecast_days=9';
+// Se pide al abrir la app, al volver a ella y cada 30 min (nunca más seguido).
+// Si falla o tarda más de 6 s, la app sigue igual y no se muestra clima ni errores.
+// Las horas de Open-Meteo vienen ya en hora de Santiago ("2026-10-06T15:00"): se cruzan por texto, sin Date ni UTC.
+// Ojo: precipitation y precipitation_probability son de la HORA ANTERIOR (el dato de "15:00" es la lluvia de 14:00 a 15:00).
+const CLIMA_URL = 'https://api.open-meteo.com/v1/forecast?latitude=-33.355&longitude=-70.525&elevation=850&hourly=temperature_2m,precipitation,precipitation_probability,weather_code&daily=temperature_2m_max,temperature_2m_min&timezone=America%2FSantiago&forecast_days=9';
+const LLUVIA_MM = 0.5, LLUVIA_PROB = 50;
 let CL = null, climaIntento = 0;
 async function cargarClima() {
   if (climaIntento && Date.now() - climaIntento < 30 * 60000) return;
@@ -352,47 +356,72 @@ async function cargarClima() {
     const r = await fetch(CLIMA_URL, { signal: ctl.signal, credentials: 'omit' });
     if (!r.ok) return;
     const j = await r.json();
-    const h = {}, d = {};
-    j.hourly.time.forEach((t, i) => { h[t] = { t: j.hourly.temperature_2m[i], p: j.hourly.precipitation_probability[i], c: j.hourly.weather_code[i] }; });
-    j.daily.time.forEach((f, i) => { d[f] = { max: j.daily.temperature_2m_max[i], min: j.daily.temperature_2m_min[i], p: j.daily.precipitation_probability_max[i], c: j.daily.weather_code[i] }; });
-    CL = { h, d };
+    const H = j.hourly, h = {}, d = {};
+    H.time.forEach((t, i) => {
+      h[t] = { t: H.temperature_2m ? H.temperature_2m[i] : null, mm: H.precipitation[i], p: H.precipitation_probability[i], c: H.weather_code[i] };
+    });
+    j.daily.time.forEach((f, i) => { d[f] = { max: j.daily.temperature_2m_max[i], min: j.daily.temperature_2m_min[i] }; });
+    CL = { h, d, hora: horaSantiago() };
     if (E && vista === 'cancha') { renderDias(); renderTimeline(); }
   } catch (e) { /* sin clima: la app sigue igual */ }
   finally { clearTimeout(to); }
 }
-const NUBE = 'M7 18.5h10a3.6 3.6 0 0 0 .3-7.19A5.2 5.2 0 0 0 7.3 12.1 3.2 3.2 0 0 0 7 18.5z';
-const NUBE_ALTA = 'M7 14.5h10a3.4 3.4 0 0 0 .3-6.79A5 5 0 0 0 7.6 8.9 2.8 2.8 0 0 0 7 14.5z';
+function horaSantiago() {
+  try { return new Intl.DateTimeFormat('es-CL', { timeZone: 'America/Santiago', hour: '2-digit', minute: '2-digit', hourCycle: 'h23' }).format(new Date()); }
+  catch (e) { return ''; }
+}
 const ICONOS = {
   sol: '<circle cx="12" cy="12" r="4"/><path d="M12 2.8v2.1M12 19.1v2.1M2.8 12h2.1M19.1 12h2.1M5.5 5.5l1.5 1.5M17 17l1.5 1.5M5.5 18.5L7 17M17 7l1.5-1.5"/>',
   parcial: '<path d="M9 2.8v1.6M3.2 8.6h1.6M4.9 4.5l1.1 1.1M13.1 4.5L12 5.6"/><path d="M5.8 11.4a3.6 3.6 0 1 1 6.4-3"/><path d="M9.5 20h8a3.2 3.2 0 0 0 .3-6.39 4.6 4.6 0 0 0-8.9 1.2A2.6 2.6 0 0 0 9.5 20z"/>',
-  nublado: '<path d="' + NUBE + '"/>',
-  lluvia: '<path d="' + NUBE_ALTA + '"/><path d="M8.5 17.5l-1 3M12.5 17.5l-1 3M16.5 17.5l-1 3"/>',
-  tormenta: '<path d="' + NUBE_ALTA + '"/><path d="M12.6 15.5l-2.2 3.4h3.2l-2.2 3.4"/>'
+  nublado: '<path d="M7 18.5h10a3.6 3.6 0 0 0 .3-7.19A5.2 5.2 0 0 0 7.3 12.1 3.2 3.2 0 0 0 7 18.5z"/>',
+  lluvia: '<path d="M7 14.5h10a3.4 3.4 0 0 0 .3-6.79A5 5 0 0 0 7.6 8.9 2.8 2.8 0 0 0 7 14.5z"/><path d="M8.5 17.5l-1 3M12.5 17.5l-1 3M16.5 17.5l-1 3"/>'
 };
-const NOMBRE_CLIMA = { sol: 'despejado', parcial: 'parcial', nublado: 'nublado', lluvia: 'lluvia', tormenta: 'tormenta' };
-function tipoClima(c) {
-  if (c == null) return '';
-  if (c <= 1) return 'sol';
-  if (c === 2) return 'parcial';
-  if (c === 3 || c === 45 || c === 48) return 'nublado';
-  if (c >= 95) return 'tormenta';
-  return 'lluvia'; // llovizna, lluvia, chubascos y nieve
-}
 function icono(tipo) { return tipo ? `<svg class="ic" viewBox="0 0 24 24" aria-hidden="true">${ICONOS[tipo]}</svg>` : ''; }
-function climaDia(fecha) {
-  try { const x = CL && CL.d[fecha]; return x && x.max != null && x.min != null ? x : null; } catch (e) { return null; }
+// Dato tal como viene de Open-Meteo para "fecha" a las "hora":00 (texto exacto)
+function datoHora(fecha, hora) {
+  if (!CL || hora < 0 || hora > 23) return null;
+  return CL.h[`${fecha}T${String(hora).padStart(2, '0')}:00`] || null;
 }
-function climaHora(fecha, t) {
+// Lluvia (mm) entre las hora:00 y hora+1:00, solo si cumple el criterio; si no, 0
+function lluviaHora(fecha, hora) {
   try {
-    const x = CL && CL.h[`${fecha}T${String(Math.floor(t / 60)).padStart(2, '0')}:00`];
-    if (!x || x.t == null) return '';
-    const temp = Math.round(x.t) + '°';
-    if (x.p != null && x.p >= 40) {
-      return `<span class="tclima" role="img" aria-label="${temp}, ${x.p}% de lluvia"><span class="moja">${icono('lluvia')}${x.p}%</span>${temp}</span>`;
+    const x = datoHora(fecha, hora + 1);
+    return x && x.mm != null && x.p != null && x.mm >= LLUVIA_MM && x.p >= LLUVIA_PROB ? x.mm : 0;
+  } catch (e) { return 0; }
+}
+const mmTxt = mm => mm.toFixed(1).replace('.', ',');
+function pildoraLluvia(mm) {
+  return mm ? `<span class="lluvia" role="img" aria-label="Lluvia probable, ${mmTxt(mm)} milímetros">${icono('lluvia')}Lluvia ${mmTxt(mm)} mm</span>` : '';
+}
+// Para un rango de minutos [ini, fin): la hora con más lluvia que cumple el criterio
+function lluviaRango(fecha, ini, fin) {
+  let max = 0;
+  for (let h = Math.floor(ini / 60); h * 60 < fin; h++) max = Math.max(max, lluviaHora(fecha, h));
+  return max;
+}
+// Resumen del día: máxima, mínima e ícono. Lluvia si entre 09:00 y 21:00 suman >= 1 mm;
+// si no, sol, parcial o nube según el weather_code más común de ese rango.
+function climaDia(fecha) {
+  try {
+    const x = CL && CL.d[fecha];
+    if (!x || x.max == null || x.min == null) return null;
+    let mm = 0; const cuenta = { sol: 0, parcial: 0, nublado: 0 };
+    for (let h = 9; h <= 21; h++) {
+      const a = datoHora(fecha, h);
+      if (!a) continue;
+      if (h >= 10 && a.mm != null) mm += a.mm;   // el dato de las 10:00 es la lluvia de 09:00 a 10:00
+      if (a.c != null) cuenta[a.c <= 1 ? 'sol' : a.c === 2 ? 'parcial' : 'nublado']++;
     }
-    const tipo = tipoClima(x.c);
-    return `<span class="tclima" role="img" aria-label="${temp}${tipo ? ', ' + NOMBRE_CLIMA[tipo] : ''}">${icono(tipo)}${temp}</span>`;
-  } catch (e) { return ''; }
+    const tipo = mm >= 1 ? 'lluvia' : Object.keys(cuenta).reduce((m, k) => cuenta[k] > cuenta[m] ? k : m, 'sol');
+    return { max: x.max, min: x.min, tipo };
+  } catch (e) { return null; }
+}
+// Primera hora con lluvia probable que dura al menos 2 horas seguidas,
+// dentro del horario de la cancha (y desde ahora, si es hoy). Un chubasco aislado no cuenta.
+function primeraLluvia(fecha) {
+  const desde = Math.floor((fecha === E.hoy ? Math.max(E.apertura, ahoraMin()) : E.apertura) / 60);
+  for (let h = desde; (h + 1) * 60 < E.cierre; h++) if (lluviaHora(fecha, h) && lluviaHora(fecha, h + 1)) return h;
+  return -1;
 }
 
 /* ---------- render ---------- */
@@ -404,7 +433,7 @@ function render() {
   if (vista === 'admin' && !adminActivo()) vista = 'cancha';
   const p = partes(E.hoy);
   $('#titulo').textContent = E.nombreApp;
-  $('#subtitulo').textContent = `Hoy ${DL[p.dow]} ${p.d} de ${ML[p.m - 1]}`;
+  $('#subtitulo').textContent = `Hoy ${DC[p.dow].toLowerCase()} ${p.d} de ${ML[p.m - 1].slice(0, 3)}`;
   $('#btnYo').innerHTML = `${esc(yo || 'Elegir')}${adminActivo() ? ' <span class="adm">Admin</span>' : ''} <span aria-hidden="true">▾</span>`;
   $('#dias').hidden = vista !== 'cancha';
   $('#tabAdmin').hidden = !adminActivo();
@@ -426,8 +455,8 @@ function renderDias() {
     const mia = d.reservas.some(esMia);
     const marca = (d.feriado ? 'Fer.' : '') + (mia ? '<i class="punto" aria-hidden="true"></i>' : '');
     const cd = climaDia(d.fecha);
-    const clima = cd ? `<i class="clima">${icono(tipoClima(cd.c))}${Math.round(cd.max)}°</i>` : '';
-    const nombre = cap(fechaLarga(d.fecha)) + (d.feriado ? ', feriado' : '') + (mia ? ', tienes reserva' : '') + (cd ? `, máxima ${Math.round(cd.max)} grados` : '');
+    const clima = cd ? `<i class="clima">${icono(cd.tipo)}${Math.round(cd.max)}°</i>` : '';
+    const nombre = cap(fechaLarga(d.fecha)) + (d.feriado ? ', feriado' : '') + (mia ? ', tienes reserva' : '') + (cd ? `, máxima ${Math.round(cd.max)} grados${cd.tipo === 'lluvia' ? ', lluvia' : ''}` : '');
     return `<button class="dia ${i === diaSel ? 'sel' : ''}" data-i="${i}" aria-label="${esc(nombre)}"${i === diaSel ? ' aria-current="date"' : ''}><b>${arriba}</b><span>${p.d}</span>${clima}<i class="marca">${marca}</i></button>`;
   }).join('');
 }
@@ -461,7 +490,8 @@ function renderTimeline() {
   const libs = d.bloques.filter(b => b.tipo === 'FIJO' && b.liberado && !(esHoy && b.fin <= ahora));
   const cuando = diaSel === 0 ? 'Hoy, ' : diaSel === 1 ? 'Mañana, ' : '';
   const cd = climaDia(d.fecha);
-  const climaTit = cd ? `<p class="climadia">${icono(tipoClima(cd.c))}<span>${Math.round(cd.min)}° a ${Math.round(cd.max)}°${cd.p != null ? `, ${cd.p}% lluvia` : ''}</span></p>` : '';
+  const hl = cd ? primeraLluvia(d.fecha) : -1;
+  const climaTit = cd ? `<p class="climadia">${icono(cd.tipo)}<span>${Math.round(cd.min)}° a ${Math.round(cd.max)}°</span>${hl >= 0 ? `<span class="moja">Lluvia probable desde las ${hhmm(hl * 60)}</span>` : ''}</p>${CL.hora ? `<p class="actualizado">Pronóstico actualizado ${CL.hora}</p>` : ''}` : '';
   let h = `<div class="diatit"><h2>${cuando ? cuando + fechaLarga(d.fecha) : cap(fechaLarga(d.fecha))}</h2>${climaTit}</div>`;
   if (esHoy && ahora >= E.cierre - 30 && E.dias.length > 1) {
     h += `<div class="aviso"><span>Por hoy ya no quedan horarios.</span><button data-ir="1">Ver mañana</button></div>`;
@@ -488,14 +518,14 @@ function renderTimeline() {
       if (esHoy && fin <= ahora) { if (pIni < 0) pIni = t; pFin = t; t = sig; continue; }
       cerrarPasado();
       const n = Math.max(1, Math.round((fin - t) / 30));
-      h += `<button class="slot bloque ${x.kind}" style="min-height:calc(var(--row) * ${n} + var(--gap) * ${n - 1})" data-accion="${x.kind}" data-ini="${x.inicio}" data-id="${esc(x.id || '')}"><span class="hh">${hhmm(t)}</span><span class="cuerpo">${contenidoBloque(x)}</span>${x.kind === 'mia' ? climaHora(d.fecha, t) : ''}</button>`;
+      h += `<button class="slot bloque ${x.kind}" style="min-height:calc(var(--row) * ${n} + var(--gap) * ${n - 1})" data-accion="${x.kind}" data-ini="${x.inicio}" data-id="${esc(x.id || '')}"><span class="hh">${hhmm(t)}</span><span class="cuerpo">${contenidoBloque(x)}</span>${x.kind === 'mia' ? pildoraLluvia(lluviaRango(d.fecha, Math.max(t, x.inicio), fin)) : ''}</button>`;
       t = sig;
       continue;
     }
     if (esHoy && t < ahora) { if (pIni < 0) pIni = t; pFin = t; t += 30; continue; }
     cerrarPasado();
     const cabe = libreHasta(occ, t) - t >= 60;
-    h += `<button class="slot libre ${cabe ? '' : 'corto'}" data-accion="libre" data-t="${t}" ${cabe ? '' : 'disabled'}><span class="hh">${hhmm(t)}</span><span class="cuerpo">${cabe ? 'Libre' : 'Solo 30 min libres'}</span>${cabe ? climaHora(d.fecha, t) + '<span class="mas" aria-hidden="true">+</span>' : ''}</button>`;
+    h += `<button class="slot libre ${cabe ? '' : 'corto'}" data-accion="libre" data-t="${t}" ${cabe ? '' : 'disabled'}><span class="hh">${hhmm(t)}</span><span class="cuerpo">${cabe ? 'Libre' : 'Solo 30 min libres'}</span>${cabe ? pildoraLluvia(lluviaHora(d.fecha, Math.floor(t / 60))) + '<span class="mas" aria-hidden="true">+</span>' : ''}</button>`;
     t += 30;
   }
   cerrarPasado();
